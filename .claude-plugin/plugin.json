@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "rookie-work",
+  "displayName": "Rookie Work",
+  "version": "0.1.0",
+  "description": "A beginner-safe workflow guardrail: the agent explains in plain language what it will do and gets your OK before changing anything, scales ceremony to task size, and never makes silent decisions.",
+  "author": { "name": "xuzheng1210" },
+  "homepage": "https://github.com/xuzheng1210/rookie-work",
+  "repository": "https://github.com/xuzheng1210/rookie-work",
+  "license": "MIT",
+  "keywords": ["beginner", "workflow", "guardrails", "safety", "collaboration"]
+}
