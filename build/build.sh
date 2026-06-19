@@ -15,9 +15,9 @@ REFS="${ROOT}/references"
 # hooks are added by later build steps (plans 2 & 3).
 rm -rf "${DIST}/codex" "${DIST}/hermes"
 for agent in codex hermes; do
-  mkdir -p "${DIST}/${agent}/skills/rookie-work"
+  mkdir -p "${DIST}/${agent}/skills/rookie-work/references"
   cp "${SKILL}" "${DIST}/${agent}/skills/rookie-work/SKILL.md"
-  cp -R "${REFS}" "${DIST}/${agent}/skills/rookie-work/references"
+  cp "${REFS}"/*.md "${DIST}/${agent}/skills/rookie-work/references/"
   cp "${PREAMBLE}" "${DIST}/${agent}/SESSION-PREAMBLE.md"
 done
 
