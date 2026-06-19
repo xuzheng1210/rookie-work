@@ -1,7 +1,7 @@
 # rookie-work 多 agent 支持 设计 spec（Codex + Hermes）
 
 > 在已发布的 Claude Code 插件（v1.0.0）之上，新增 OpenAI Codex 与 NousResearch Hermes(`hermes-agent`) 支持。
-> 状态：设计定稿（2026-06-19），待写实现计划。前置 spec：`2026-06-19-rookie-work-design.md`（基础设计）。
+> 状态：设计定稿（2026-06-19）→ 计划 1–3 已实现并自动验证 → **真机验证回填（2026-06-20）**：Codex on Windows、Hermes on WSL，§7 风险均有实测结论；下一步 = 计划 5（Codex marketplace 打包 + 双 README）。前置 spec：`2026-06-19-rookie-work-design.md`（基础设计）。
 
 ## 0. 一句话
 
@@ -35,6 +35,7 @@ rookie-work/                         # 仓库根 = CC 插件（真相源；publi
 - **生成物提交入库**：自托管安装需从仓库取到，故 `dist/` 提交（非 gitignore）。
 - **防漂移闸**：一个测试重跑 `build.sh` 后断言 `dist/` 无 `git diff`——改了权威内容忘重跑就红，把「单一真相源」变成强制约束。
 - **CC 不动**：仓库根的 CC 插件与 v1.0.0 安装路径（`marketplace.json` `source:"./"`）保持不变。
+- **行尾归一化（LF）（2026-06-20 补）**：根部 `.gitattributes`（`* text=auto eol=lf`）强制全仓 text 文件 checkout 为 LF。否则 Windows clone（Git 默认 `core.autocrlf=true`）把钩子脚本（`*.sh`/`session-start`）转成 CRLF，在 WSL/Unix 下因行尾带 CR 而无法执行（实测踩到）。
 
 ## 3. 共享 vs 各 agent 差异
 
@@ -56,19 +57,22 @@ rookie-work/                         # 仓库根 = CC 插件（真相源；publi
 - `skills/rookie-work/SKILL.md`（= 权威 SKILL.md，frontmatter 不变）+ `skills/rookie-work/references/*`。
 - `hooks/{hooks.json, session-start, run-hook.cmd}`（= CC 钩子；`hooks.json` matcher `startup|resume|clear|compact`）。
 - 调用：`$rookie-work` 或 `/skills`；description 也支持隐式自动加载。
+- **自托管分发（实测 2026-06-20）**：Codex 装插件需 marketplace 清单——仓库根 `.agents/plugins/marketplace.json`，插件项用 `git-subdir` source 指向仓库内 `dist/codex`；用户 `codex plugin marketplace add xuzheng1210/rookie-work`（clone 仓库读清单）+ `codex plugin add rookie-work@<mkt>` 即从 GitHub 装技能。`dist/codex/.codex-plugin/plugin.json` 仍是插件自身清单。
+- **⚠️ 常开钩子要用户级（实测 2026-06-20）**：插件自带 `hooks/hooks.json` **不**随安装自动激活，故"每会话强制注入"必须另加用户级 `~/.codex/hooks.json`（跑 `dist/codex/hooks/run-hook.cmd session-start`，见 §7.1）。
 
 ### 4.2 Hermes 包（`dist/hermes/`）
 - `skills/rookie-work/SKILL.md`（= 权威 SKILL.md）+ `references/*`。Hermes 按 `name` slug 自动暴露 `/rookie-work`。
 - `agent-hooks/rookie-work-inject.sh`（`pre_llm_call` 钩子，见上）。
 - `config-snippet.yaml`：要用户合并进 `~/.hermes/config.yaml` 的 `hooks:` 片段。
 - `INSTALL.md`：放技能目录 + 加钩子 + 首次同意说明。
+- **运行环境（实测 2026-06-20）**：钩子是 Unix bash 脚本 + 依赖 `python3`（解析 stdin `is_first_turn`）。在 macOS/Linux/**WSL** 原生可用（WSL 实测 python3 3.12.3）。**原生 Windows 不支持**（Hermes `shell_hooks.py` 用 `shlex.split`+`shell=False`：吞反斜杠、不能执行 `.sh`）→ 见 §9。
 
 ## 5. 安装（自托管，三家从 GitHub 仓库；官方市场列 backlog）
 
 - **CC**：不变——`/plugin marketplace add https://github.com/xuzheng1210/rookie-work` → `/plugin install rookie-work@rookie-work-marketplace`。
-- **Codex**：自托管 Codex marketplace（若 schema 实测可行），或把 `dist/codex/skills/rookie-work/` 拷进 `~/.codex/skills/` 并按 `dist/codex/` 的 INSTALL 装钩子。
-- **Hermes**：`hermes skills tap add xuzheng1210/rookie-work`（若实测能发现 `dist/hermes` 技能），或把 `dist/hermes/skills/rookie-work/` 拷进 `~/.hermes/skills/` + 合并 `config-snippet.yaml` 的钩子（首次同意，或 `HERMES_ACCEPT_HOOKS=1`/`hooks_auto_accept`）。
-- README 给每家确切命令；确切自托管接线以"先验证"任务结果为准（见 §7）。
+- **Codex（实测 2026-06-20，Windows）**：① `codex plugin marketplace add xuzheng1210/rookie-work` ② `codex plugin add rookie-work@<mkt>`（装技能）③ **加用户级 `~/.codex/hooks.json`** 开常驻（自带钩子不自动激活）④ 首次交互有钩子信任提示。Mac 同命令（Unix 原生，待补冒烟）。
+- **Hermes（实测 2026-06-20，WSL）**：在 WSL（= Linux）里——拷 `dist/hermes/skills/rookie-work/` → `~/.hermes/skills/`、`dist/hermes/agent-hooks/*` → `~/.hermes/agent-hooks/`（`chmod +x`）、把 `config-snippet.yaml` 的 `hooks:` 合并进 `~/.hermes/config.yaml`；首次钩子 `Allow this hook to run? [y/N]`（或 `--accept-hooks` / `hooks_auto_accept: true`）。**Windows 上请在 WSL 下用**；原生 Windows 见 §9。`hermes skills tap add` 能否一条命令发现 `dist/hermes` 技能 = 仍待测，不阻塞（丢目录法已验通）。
+- README 给每家确切命令。
 
 ## 6. 关闭开关
 
@@ -76,12 +80,13 @@ rookie-work/                         # 仓库根 = CC 插件（真相源；publi
 - **Hermes 额外**：原生 `skills.disabled:[rookie-work]`（从斜杠命令表 + 系统提示索引一并过滤）/ 删 `config.yaml` 钩子条目，README 一并写。
 - SKILL.md 的"口头当场关 / 持久关"一节三家通用（持久关的标记路径已与钩子逐字一致）。
 
-## 7. 风险 / 待实测（明确风险；每个 agent 的实现计划第一项任务 = 真机安装验证兜底，验证通过才继续）
+## 7. 风险 / 实测结论（2026-06-20 真机验证回填；Codex on Windows、Hermes on WSL）
 
-1. **【高】Codex 插件自带 `hooks/hooks.json` 是否安装即自动激活**：官方文档说可 bundle，但 superpowers 的 Codex 包刻意剔除了 hooks，存在矛盾。**先验证**；若不自动激活，退路 = 文档教用户加用户级 `~/.codex/hooks.json`（已确认支持），仍保住强制注入。
-2. **【中】Hermes `pre_llm_call` 每回合注入的体验/成本 + 钩子首次同意对新手的摩擦**：**先验证** `is_first_turn` 收敛是否够、同意流程是否可接受；摩擦过大则在 INSTALL 里给 `hooks_auto_accept`/env 的清晰指引。
-3. **【中】Codex `CODEX_PROJECT_DIR` 是否存在**：已用 `$PWD` 兜底；实测确认。
-4. **【低】Hermes `claude-marketplace` 源能否直接吃 `.claude-plugin/marketplace.json`**：能则多一条安装路；否则走 tap / 丢目录。
+1. **【高·已解决】Codex 插件自带 `hooks/hooks.json` 是否安装即自动激活**：实测**否**——插件钩子不随安装自动执行（`codex exec` 仅加载技能、不注入纪律）。**结论**：常开注入走用户级 `~/.codex/hooks.json`（跑 `run-hook.cmd session-start`，须设 `CLAUDE_PLUGIN_ROOT` 指向已装插件目录，否则脚本退化为顶层 `additionalContext` 而非 `hookSpecificOutput`）。技能本身经 marketplace 安装可见。**留一脚活检**：用户级钩子在真**交互**会话（非 `exec`）触发注入。
+2. **【中·已解决】Hermes `pre_llm_call` 每回合注入 + 首次同意摩擦**：实测 `is_first_turn` 收敛成立（非首回合输出 `{}`，不刷屏）；同意 = 首次 `Allow this hook to run? [y/N]`，可用 `--accept-hooks` 或 `~/.hermes/config.yaml` 的 `hooks_auto_accept: true` 跳过；`hermes hooks doctor` 全绿；WSL 端到端复述出三原则三档。
+3. **【中·已解决】Codex `CODEX_PROJECT_DIR`**：`$PWD` 兜底足够——钩子在 Windows 经 `run-hook.cmd`→Git Bash 产出正确 `hookSpecificOutput` JSON。
+4. **【低·待测，不阻塞】Hermes `tap add` 能否直接发现 `dist/hermes` 技能**：未验证；丢目录 + 合并 config 已验通，作主路；tap 一条命令导入留作增强。
+5. **【新增·已解决】行尾（CRLF）**：Windows clone 把脚本转 CRLF，致 WSL 因脚本带 CR 无法执行；已加根部 `.gitattributes`（`* text=auto eol=lf`）修复（提交 `4e61c68`）。
 
 ## 8. 测试策略
 
@@ -89,6 +94,7 @@ rookie-work/                         # 仓库根 = CC 插件（真相源；publi
 - **防漂移闸**：CI/测试重跑 `build.sh` 后 `git diff --exit-code dist/` 必须干净。
 - **钩子单测**：Codex 复用 CC 的 `test-session-start.sh`（隔离 HOME，验证默认注入/全局关/项目关）；Hermes 新增 `test-pre-llm-call.sh`（首回合注入 / 非首回合空 / 标记抑制）。
 - **真机冒烟**：每个 agent 的实现计划以"先真机验证"开场（最小带钩子样例，确认技能加载 + 注入 + 关闭），末尾走完整行为冒烟（Tier 0/1/2 + 开关），如 CC。
+- **行尾归一化守护**：`.gitattributes` 已强制 LF；可加一条断言守住（防误删后 Windows clone 再坏）。
 
 ## 9. 非目标 / backlog
 
@@ -96,6 +102,8 @@ rookie-work/                         # 仓库根 = CC 插件（真相源；publi
 - **官方市场上架**（openai/plugins PR、Hermes Skills Hub）—— backlog。
 - **其它 agent**（Cursor / Gemini / OpenCode 等）—— backlog（架构已为之留出"加一个外壳模板 + 钩子变体"的扩展位）。
 - Hermes 的 **SOUL.md 被动常开路线** —— 仅作"轻量默认"记录，非主方案。
+- **原生 Windows 的 Hermes** —— backlog（实测 `shell_hooks.py` 用 `shlex.split`+`subprocess.run(shell=False)`：吞 Windows 反斜杠路径、且无法直接执行 `.sh`，无 Windows 适配；要支持需包装器 + 绕开 shlex，部分受源码限制。Windows 用户当前走 WSL）。
+- **Codex 用户级钩子路径健壮性** —— 当前引用带版本号的插件缓存路径（`~/.codex/plugins/cache/.../<ver>/...`）跨版本会脆；计划 5 给更稳写法。
 
 ## 10. 成功标准
 
@@ -103,3 +111,13 @@ rookie-work/                         # 仓库根 = CC 插件（真相源；publi
 - Codex、Hermes 各自：技能可调用（`/rookie-work` 或 `$rookie-work`）；**新会话/首回合自动注入纪律**（强制注入成立，经真机验证）；建/删标记文件可**持久开关**（经真机验证）。
 - CC v1.0.0 不受影响。
 - 三家共享同一份方法正文，逐字一致。
+
+## 11. 平台 × agent 支持矩阵（2026-06-20）
+
+| | macOS | Windows |
+|---|---|---|
+| **Claude Code** | ✅ 实证（一条命令 GitHub 导入 + 默认常开） | ✅ 机制已证（`run-hook.cmd` 经 Git Bash 产出正确 JSON）；真 CC 会话待补冒烟 |
+| **Codex** | 预期可行（Unix 原生）；同命令，待补冒烟 | ✅ 实测：marketplace 装技能 + 用户级 hooks 常开 + 开关；自带钩子不自动激活 |
+| **Hermes** | 预期可行（Unix 原生，需 python3）；待补冒烟 | ✅ 经 **WSL** 端到端通；**原生 Windows = backlog** |
+
+- 共用机制（同一套 Unix 脚本 + 标记开关）使"机制已证"对未单独冒烟的格子有较强外推；但"机制已证"≠"实证"，三个待补冒烟格（Mac 的 Codex/Hermes、真 Windows CC 会话）如实标注。
