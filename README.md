@@ -25,9 +25,8 @@ After a new version is published, run `/plugin marketplace update` to get it.
 
 ## Turn it off
 
-Tell the agent "turn off rookie-work" (or "give me raw mode") any time, and it stands down for the current session.
-
-*(A persistent, across-sessions off-switch ships with the activation hook — see `docs/`.)*
+- **Just this session:** tell the agent "turn off rookie-work" (or "give me raw mode"); it stands down for the current session.
+- **Persistently:** create an empty file `~/.rookie-work-off` to turn it off everywhere, or `<your-project>/.rookie-work-off` to turn it off for one project. Delete the file to turn it back on. (You can also just ask the agent to do this for you.)
 
 ## Language
 
@@ -35,7 +34,7 @@ rookie-work talks to you in **your** language — whatever you write in, it answ
 
 ## Status
 
-Early development (v0.1.0). Behavior is being built out plan-by-plan; see `docs/specs/` and `docs/plans/`.
+v1.0.0 — first public release. Design and implementation notes live in `docs/`.
 
 ## License
 
