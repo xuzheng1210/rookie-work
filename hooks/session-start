@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 GLOBAL_OFF="${HOME}/.rookie-work-off"
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$PWD}"
+PROJECT_DIR="${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-$PWD}}"
 PROJECT_OFF="${PROJECT_DIR}/.rookie-work-off"
 
 if [ -f "$GLOBAL_OFF" ] || [ -f "$PROJECT_OFF" ]; then
