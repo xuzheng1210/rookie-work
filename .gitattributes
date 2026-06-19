@@ -1,0 +1,9 @@
+# Force LF on checkout for every text file, on every platform.
+#
+# Why: the hook scripts (*.sh, session-start, run-hook.cmd) and the injected
+# SESSION-PREAMBLE.md are consumed by Unix tooling (bash, /usr/bin/env, WSL,
+# Git Bash). A Windows clone uses Git's default core.autocrlf=true, which would
+# rewrite them to CRLF — breaking script execution under WSL/Unix
+# (`/usr/bin/env: 'bash\r': No such file or directory`) and putting stray \r into
+# the injected context. Normalizing to LF everywhere keeps every checkout correct.
+* text=auto eol=lf
