@@ -30,6 +30,7 @@ CMDBLOCK
 
 # Unix path. (Wrapper pattern adapted from superpowers, MIT.)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+[ -n "${1:-}" ] || { echo "run-hook.cmd: missing script name" >&2; exit 1; }
 SCRIPT_NAME="$1"
 shift
 exec bash "${SCRIPT_DIR}/${SCRIPT_NAME}" "$@"

@@ -13,7 +13,7 @@ PROJECT_OFF="${PROJECT_DIR}/.rookie-work-off"
 if [ -f "$GLOBAL_OFF" ] || [ -f "$PROJECT_OFF" ]; then
   CONTEXT="rookie-work is installed but currently OFF (an off-switch marker is present). To turn it back on, remove the marker file: ${GLOBAL_OFF} (everywhere) or ${PROJECT_OFF} (this project only)."
 else
-  CONTEXT="$(cat "${PLUGIN_ROOT}/SESSION-PREAMBLE.md" 2>/dev/null || echo "rookie-work is active, but its preamble file is missing.")"
+  CONTEXT="$(cat "${PLUGIN_ROOT}/SESSION-PREAMBLE.md" 2>/dev/null || { echo "rookie-work: preamble not found at ${PLUGIN_ROOT}/SESSION-PREAMBLE.md" >&2; echo "rookie-work is active, but its preamble file is missing."; })"
 fi
 
 # Escape a string for embedding inside a JSON string value.
