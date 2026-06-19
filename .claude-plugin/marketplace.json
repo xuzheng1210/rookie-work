@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "rookie-work-marketplace",
+  "owner": { "name": "xuzheng1210" },
+  "description": "Marketplace hosting the rookie-work plugin.",
+  "plugins": [
+    {
+      "name": "rookie-work",
+      "source": "./",
+      "description": "A beginner-safe workflow guardrail for Claude Code.",
+      "version": "0.1.0",
+      "author": { "name": "xuzheng1210" },
+      "category": "workflow",
+      "keywords": ["beginner", "workflow", "guardrails"]
+    }
+  ]
+}
