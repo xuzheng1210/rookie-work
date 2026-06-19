@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# rookie-work SessionStart hook: inject the compact discipline preamble,
+# unless an off-switch marker is present.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+GLOBAL_OFF="${HOME}/.rookie-work-off"
+PROJECT_DIR="${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-$PWD}}"
+PROJECT_OFF="${PROJECT_DIR}/.rookie-work-off"
+
+if [ -f "$GLOBAL_OFF" ] || [ -f "$PROJECT_OFF" ]; then
+  CONTEXT="rookie-work is installed but currently OFF (an off-switch marker is present). To turn it back on, remove the marker file: ${GLOBAL_OFF} (everywhere) or ${PROJECT_OFF} (this project only)."
+else
+  CONTEXT="$(cat "${PLUGIN_ROOT}/SESSION-PREAMBLE.md" 2>/dev/null || { echo "rookie-work: preamble not found at ${PLUGIN_ROOT}/SESSION-PREAMBLE.md" >&2; echo "rookie-work is active, but its preamble file is missing."; })"
+fi
+
+# Escape a string for embedding inside a JSON string value.
+escape_for_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
+CTX="$(escape_for_json "$CONTEXT")"
+
+# Emit platform-aware JSON. Claude Code consumes hookSpecificOutput.additionalContext;
+# other SDK platforms consume top-level additionalContext.
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$CTX"
+else
+  printf '{\n  "additionalContext": "%s"\n}\n' "$CTX"
+fi
+exit 0

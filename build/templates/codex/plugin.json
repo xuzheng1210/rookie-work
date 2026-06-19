@@ -1,0 +1,12 @@
+{
+  "name": "rookie-work",
+  "version": "__VERSION__",
+  "description": "A beginner-safe workflow guardrail: the agent explains in plain language what it will do and gets your OK before changing anything, scales ceremony to task size, and never makes silent decisions.",
+  "skills": "./skills/",
+  "author": { "name": "xuzheng1210" },
+  "homepage": "https://github.com/xuzheng1210/rookie-work",
+  "repository": "https://github.com/xuzheng1210/rookie-work",
+  "license": "MIT",
+  "keywords": ["beginner", "workflow", "guardrails", "safety", "collaboration"],
+  "interface": { "displayName": "Rookie Work", "category": "Coding" }
+}

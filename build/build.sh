@@ -21,6 +21,12 @@ for agent in codex hermes; do
   cp "${PREAMBLE}" "${DIST}/${agent}/SESSION-PREAMBLE.md"
 done
 
+# --- Codex package: manifest (version injected from CC's manifest) + reuse CC hooks ---
+VER="$(python3 -c "import json;print(json.load(open('${ROOT}/.claude-plugin/plugin.json'))['version'])")"
+mkdir -p "${DIST}/codex/.codex-plugin" "${DIST}/codex/hooks"
+sed "s/__VERSION__/${VER}/" "${ROOT}/build/templates/codex/plugin.json" > "${DIST}/codex/.codex-plugin/plugin.json"
+cp "${ROOT}/hooks/hooks.json" "${ROOT}/hooks/session-start" "${ROOT}/hooks/run-hook.cmd" "${DIST}/codex/hooks/"
+
 # Generated-marker for the whole dist/ (SKILL.md frontmatter & JSON can't carry comments).
 mkdir -p "${DIST}"
 cat > "${DIST}/README.md" <<'EOF'

@@ -25,6 +25,16 @@ done
 
 if [ -f "${ROOT}/dist/README.md" ] && grep -q "DO NOT EDIT" "${ROOT}/dist/README.md"; then ok "dist/README.md generated-marker"; else bad "dist/README.md generated-marker"; fi
 
+# --- Codex-specific generated files ---
+cm="${ROOT}/dist/codex/.codex-plugin/plugin.json"
+if python3 -c "import json,sys;m=json.load(open('${cm}'));sys.exit(0 if m.get('name')=='rookie-work' and m.get('skills')=='./skills/' else 1)" 2>/dev/null; then ok "codex: plugin.json valid (name+skills)"; else bad "codex: plugin.json valid (name+skills)"; fi
+ccv="$(python3 -c "import json;print(json.load(open('${ROOT}/.claude-plugin/plugin.json'))['version'])" 2>/dev/null)"
+cxv="$(python3 -c "import json;print(json.load(open('${cm}'))['version'])" 2>/dev/null)"
+if [ -n "$cxv" ] && [ "$ccv" = "$cxv" ]; then ok "codex: version matches CC ($ccv)"; else bad "codex: version matches CC (cc=$ccv codex=$cxv)"; fi
+for f in hooks/hooks.json hooks/session-start hooks/run-hook.cmd; do
+  if [ -f "${ROOT}/dist/codex/${f}" ]; then ok "codex: ${f} present"; else bad "codex: ${f} present"; fi
+done
+
 # Determinism: snapshot, rebuild, compare contents
 T1="$(mktemp -d)"; cp -R "${ROOT}/dist" "${T1}/dist1"
 bash "${ROOT}/build/build.sh" >/dev/null 2>&1
