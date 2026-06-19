@@ -17,7 +17,7 @@ It is **on by default** the moment you install it.
 ## Install
 
 ```text
-/plugin marketplace add xuzheng1210/rookie-work
+/plugin marketplace add https://github.com/xuzheng1210/rookie-work
 /plugin install rookie-work@rookie-work-marketplace
 ```
 
