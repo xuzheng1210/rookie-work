@@ -1,0 +1,6 @@
+# Merge this into your ~/.hermes/config.yaml.
+# Runs rookie-work's pre_llm_call hook (first-turn injection + off-switch).
+hooks:
+  pre_llm_call:
+    - command: "~/.hermes/agent-hooks/rookie-work-inject.sh"
+      timeout: 10

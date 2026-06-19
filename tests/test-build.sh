@@ -35,6 +35,13 @@ for f in hooks/hooks.json hooks/session-start hooks/run-hook.cmd; do
   if [ -f "${ROOT}/dist/codex/${f}" ]; then ok "codex: ${f} present"; else bad "codex: ${f} present"; fi
 done
 
+# --- Hermes-specific generated files ---
+hh="${ROOT}/dist/hermes/agent-hooks/rookie-work-inject.sh"
+if [ -x "$hh" ]; then ok "hermes: inject.sh present+exec"; else bad "hermes: inject.sh present+exec"; fi
+if diff -q "${ROOT}/SESSION-PREAMBLE.md" "${ROOT}/dist/hermes/agent-hooks/SESSION-PREAMBLE.md" >/dev/null 2>&1; then ok "hermes: co-located preamble == canonical"; else bad "hermes: co-located preamble == canonical"; fi
+if [ -f "${ROOT}/dist/hermes/config-snippet.yaml" ]; then ok "hermes: config-snippet.yaml present"; else bad "hermes: config-snippet.yaml present"; fi
+if [ -f "${ROOT}/dist/hermes/INSTALL.md" ]; then ok "hermes: INSTALL.md present"; else bad "hermes: INSTALL.md present"; fi
+
 # Determinism: snapshot, rebuild, compare contents
 T1="$(mktemp -d)"; cp -R "${ROOT}/dist" "${T1}/dist1"
 bash "${ROOT}/build/build.sh" >/dev/null 2>&1

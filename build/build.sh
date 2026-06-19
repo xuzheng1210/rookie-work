@@ -27,6 +27,14 @@ mkdir -p "${DIST}/codex/.codex-plugin" "${DIST}/codex/hooks"
 sed "s/__VERSION__/${VER}/" "${ROOT}/build/templates/codex/plugin.json" > "${DIST}/codex/.codex-plugin/plugin.json"
 cp "${ROOT}/hooks/hooks.json" "${ROOT}/hooks/session-start" "${ROOT}/hooks/run-hook.cmd" "${DIST}/codex/hooks/"
 
+# --- Hermes package: pre_llm_call hook + co-located preamble + config snippet + INSTALL ---
+mkdir -p "${DIST}/hermes/agent-hooks"
+cp "${ROOT}/build/templates/hermes/rookie-work-inject.sh" "${DIST}/hermes/agent-hooks/rookie-work-inject.sh"
+chmod +x "${DIST}/hermes/agent-hooks/rookie-work-inject.sh"
+cp "${PREAMBLE}" "${DIST}/hermes/agent-hooks/SESSION-PREAMBLE.md"
+cp "${ROOT}/build/templates/hermes/config-snippet.yaml" "${DIST}/hermes/config-snippet.yaml"
+cp "${ROOT}/build/templates/hermes/INSTALL.md" "${DIST}/hermes/INSTALL.md"
+
 # Generated-marker for the whole dist/ (SKILL.md frontmatter & JSON can't carry comments).
 mkdir -p "${DIST}"
 cat > "${DIST}/README.md" <<'EOF'
