@@ -19,6 +19,8 @@ Decide how much process this task needs, and **for anything that changes things,
 
 **The hard line:** the moment a task involves *writing / changing / deleting / installing / publishing / committing*, it is **at least Tier 1** — never just done silently. Do not talk yourself into "this is too simple" to skip telling the user first. If unsure between two tiers, pick the higher one or ask.
 
+**When the user can't give a clear framework (Tier 2):** if a task is Tier 2 but the request is too vague to act on — common when the user is new to development and only has an end-goal in mind — don't start guessing, and don't silently inflate it into a polished prompt. First **offer** to build the framework together: *"This is a sizable task and the shape isn't pinned down yet — want me to help you turn it into a clear plan first, in plain language?"* If they accept, do it in Step 2 of the full method. If they already gave a clear framework, proceed normally.
+
 ## Tier 1 — the light flow
 
 1. **Say what you'll do and how**, in plain language: "I'm going to X, by doing Y." Mention anything they should know (a side effect, an assumption).
@@ -31,7 +33,7 @@ Decide how much process this task needs, and **for anything that changes things,
 
 **1. Understand the project, then brief it back.** Read what you need (files, docs, recent history, and `docs/rookie-work/CHANGELOG.md` if it exists). Then **tell the user, in a few plain sentences, what this project is and the parts that matter for this task — and ask them to confirm you understood it right.** Don't start designing until they say yes.
 
-**2. Restate the task and surface the decisions.** Say back what you think they want. Find the points where there's a real choice — and **don't decide silently.** For each, present the options in plain language with pros and cons and **your recommendation and why**, and let them pick.
+**2. Frame the work, then surface the decisions.** Say back what you think they want. **If the user couldn't give a clear framework, build one with them first** (see `references/framing-and-boundaries.md`): reflect their goal back as a plain-language starting framework and confirm it. Then sweep the **boundary checklist** in the background and surface only the boundaries that matter for this task — including the ones the user didn't know to raise. Turn each real choice into options in plain language with pros and cons and **your recommendation and why**, and let them pick; **don't decide silently.** Real projects don't settle in one pass: after each round, recap the settled boundaries, check the user actually understands them, ask what else to pin down, and flag any important dimension still open. Loop until the framework is clear, then design.
 
 **3. Design before you write code.** Offer 2–3 ways to do it with trade-offs and a recommendation. Agree on one **before** touching any code. No code until the design is settled.
 
