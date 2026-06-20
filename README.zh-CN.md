@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/banner.png" alt="rookie-work — 新手安全护栏" width="840">
+</p>
+
 # rookie-work
 
 [English](./README.md) | **简体中文**

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/banner.png" alt="rookie-work — beginner-safe AI guardrail" width="840">
+</p>
+
 # rookie-work
 
 **English** | [简体中文](./README.zh-CN.md)

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100vw; height:100vh; overflow:hidden; }
+  .banner {
+    width:100vw; height:100vh; position:relative; overflow:hidden;
+    background:
+      radial-gradient(56% 88% at 50% 47%, rgba(255,209,80,0.13), rgba(255,209,80,0) 70%),
+      linear-gradient(180deg, #221e17 0%, #15120d 100%);
+    font-family:'Press Start 2P', ui-monospace, monospace;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .row { display:flex; align-items:center; justify-content:center; width:100%; }
+  .side { flex:1 1 0; min-width:0; }
+  .side.left { text-align:right; }
+  .side.right { text-align:left; }
+  .word { color:#F7F1E3; font-size:50px; letter-spacing:2px; white-space:nowrap;
+          text-shadow:0 5px 0 rgba(0,0,0,0.45); }
+  #chick { flex:0 0 auto; width:224px; height:auto; display:block; margin:0 36px;
+           filter:drop-shadow(0 7px 0 rgba(0,0,0,0.32)); }
+  .tag { margin-top:34px; color:#E8B948; font-size:15px;
+         letter-spacing:6px; opacity:.92; }
+  .star { position:absolute; width:6px; height:6px; background:#fff; opacity:.16; }
+  .s1{left:11%;top:23%;opacity:.20} .s2{left:86%;top:29%;opacity:.18}
+  .s3{left:80%;top:72%;opacity:.15} .s4{left:18%;top:73%;opacity:.16}
+  .s5{left:50%;top:15%;opacity:.10} .s6{left:7%;top:52%;opacity:.12}
+  .s7{left:92%;top:52%;opacity:.12}
+</style>
+</head>
+<body>
+  <div class="banner">
+    <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>
+    <span class="star s4"></span><span class="star s5"></span><span class="star s6"></span>
+    <span class="star s7"></span>
+    <div class="row">
+      <div class="side left"><span class="word">rookie</span></div>
+      <svg id="chick"></svg>
+      <div class="side right"><span class="word">work</span></div>
+    </div>
+    <div class="tag">beginner-safe AI guardrail</div>
+  </div>
+  <script>
+    const CHICK = [
+      "       ooooo       ",
+      "      ossssso      ",
+      "     ossssssso     ",
+      "     oss s sso     ",
+      "       ooooo       ",
+      "     oohhhhhoo     ",
+      "    ohhyyyyyhho    ",
+      "   ohyyyyyyyyyho   ",
+      "   oyyyyyyyyyyyo   ",
+      "  oyyyyyyyyyyyyyo  ",
+      "  oyyewyyyyyweyyo  ",
+      "  oyyeeyyyyyeeyyo  ",
+      "  oyyyyybBbyyyyyo  ",
+      "  oyyyyybbbyyyyyo  ",
+      "  odyyyyyyyyyyydo  ",
+      "   odyyyyyyyyydo   ",
+      "    oddyyyyyddo    ",
+      "   ooooooooooooo   ",
+      "  ossssssssssssso  ",
+      "  osssscssscsssso  ",
+      "  ossssssssssssso  ",
+      "   oooosssssoooo   ",
+      "      ooooooo      ",
+    ];
+    const COL = {
+      o:'#1b1308', y:'#FFD23F', h:'#FFE79A', d:'#E3A52A',
+      e:'#1b1308', w:'#FFFFFF', b:'#FF8A1E', B:'#E0700F',
+      s:'#F4E8CB', k:'#D6C196', c:'#B5945A'
+    };
+    const P = 10;
+    const W = Math.max(...CHICK.map(r => r.length));
+    const H = CHICK.length;
+    let rects = '';
+    for (let y = 0; y < H; y++) {
+      const row = CHICK[y];
+      for (let x = 0; x < row.length; x++) {
+        const ch = row[x];
+        if (ch === ' ' || !COL[ch]) continue;
+        rects += '<rect x="' + (x*P) + '" y="' + (y*P) + '" width="' + P + '" height="' + P + '" fill="' + COL[ch] + '"/>';
+      }
+    }
+    const svg = document.getElementById('chick');
+    svg.setAttribute('viewBox', '0 0 ' + (W*P) + ' ' + (H*P));
+    svg.setAttribute('shape-rendering', 'crispEdges');
+    svg.innerHTML = rects;
+  </script>
+</body>
+</html>
