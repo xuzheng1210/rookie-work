@@ -23,6 +23,7 @@ OUT="$(run_hook)"
 if printf '%s' "$OUT" | python3 -m json.tool >/dev/null 2>&1; then ok "default: valid JSON"; else bad "default: valid JSON"; fi
 if printf '%s' "$OUT" | grep -q "hookSpecificOutput"; then ok "default: uses hookSpecificOutput"; else bad "default: uses hookSpecificOutput"; fi
 if printf '%s' "$OUT" | grep -q "Explain before you act"; then ok "default: injects discipline"; else bad "default: injects discipline"; fi
+if printf '%s' "$OUT" | grep -q "build the framework"; then ok "default: injects framing trigger"; else bad "default: injects framing trigger"; fi
 
 # 2) Global off-marker
 touch "$TMP/home/.rookie-work-off"
