@@ -11,6 +11,7 @@ rookie-work makes Claude Code work the way a careful senior engineer would, so p
 - **No silent decisions.** Whenever there's a real choice (which approach, which model to use for a sub-task, whether to run an extra review), the agent lays out the options with pros and cons and a recommendation, and lets you pick.
 - **Right-sized ceremony.** A read-only lookup just happens. A small edit gets a quick "here's what I'll do — OK?". A real feature gets a full understand → design → plan → build → verify flow. Nothing trivial gets bogged down; nothing risky gets rushed.
 - **Leaves a trail.** Every change is recorded in a plain-language changelog, so you (and the agent, later) can see what happened and why.
+- **Gets you started even if you can't write a spec.** If you only know the result you want, it offers to build the development framework *with* you first — in plain language, one decision at a time — so you understand and own what you're building before any code.
 
 It is **on by default** the moment you install it.
 
@@ -79,7 +80,7 @@ rookie-work talks to you in **your** language — whatever you write in, it answ
 
 ## Status
 
-v1.0.0 — first public release. Design and implementation notes live in `docs/`.
+v1.1.0 — adds a framing & boundary-finding front-stage to Tier 2 (helps users new to development turn a vague idea into a clear, owned plan before any code). v1.0.0 was the first public release. Design and implementation notes live in `docs/`.
 
 ## License
 

@@ -1,6 +1,6 @@
 {
   "name": "rookie-work",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A beginner-safe workflow guardrail: the agent explains in plain language what it will do and gets your OK before changing anything, scales ceremony to task size, and never makes silent decisions.",
   "skills": "./skills/",
   "author": { "name": "xuzheng1210" },
