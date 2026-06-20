@@ -82,7 +82,7 @@ rookie-work/                         # 仓库根 = CC 插件（真相源；publi
 
 ## 7. 风险 / 实测结论（2026-06-20 真机验证回填；Codex on Windows、Hermes on WSL）
 
-1. **【高·已解决】Codex 插件自带 `hooks/hooks.json` 是否安装即自动激活**：实测**否**——插件钩子不随安装自动执行（`codex exec` 仅加载技能、不注入纪律）。**结论**：常开注入走用户级 `~/.codex/hooks.json`（跑 `run-hook.cmd session-start`，须设 `CLAUDE_PLUGIN_ROOT` 指向已装插件目录，否则脚本退化为顶层 `additionalContext` 而非 `hookSpecificOutput`）。技能本身经 marketplace 安装可见。**留一脚活检**：用户级钩子在真**交互**会话（非 `exec`）触发注入。
+1. **【高·已解决】Codex 插件自带 `hooks/hooks.json` 是否安装即自动激活**：实测**否**——插件钩子不随安装自动执行（`codex exec` 仅加载技能、不注入纪律）。**结论**：常开注入走用户级 `~/.codex/hooks.json`（跑 `run-hook.cmd session-start`，须设 `CLAUDE_PLUGIN_ROOT` 指向已装插件目录，否则脚本退化为顶层 `additionalContext` 而非 `hookSpecificOutput`）。技能本身经 marketplace 安装可见。**已确认（2026-06-20）**：`codex plugin marketplace add xuzheng1210/rookie-work` 从 GitHub 装通（`git-subdir`→`dist/codex`），且用户级钩子在真**交互**会话注入成立（Codex 复述三原则+三档，首次有钩子信任提示）。
 2. **【中·已解决】Hermes `pre_llm_call` 每回合注入 + 首次同意摩擦**：实测 `is_first_turn` 收敛成立（非首回合输出 `{}`，不刷屏）；同意 = 首次 `Allow this hook to run? [y/N]`，可用 `--accept-hooks` 或 `~/.hermes/config.yaml` 的 `hooks_auto_accept: true` 跳过；`hermes hooks doctor` 全绿；WSL 端到端复述出三原则三档。
 3. **【中·已解决】Codex `CODEX_PROJECT_DIR`**：`$PWD` 兜底足够——钩子在 Windows 经 `run-hook.cmd`→Git Bash 产出正确 `hookSpecificOutput` JSON。
 4. **【低·待测，不阻塞】Hermes `tap add` 能否直接发现 `dist/hermes` 技能**：未验证；丢目录 + 合并 config 已验通，作主路；tap 一条命令导入留作增强。
@@ -117,7 +117,7 @@ rookie-work/                         # 仓库根 = CC 插件（真相源；publi
 | | macOS | Windows |
 |---|---|---|
 | **Claude Code** | ✅ 实证（一条命令 GitHub 导入 + 默认常开） | ✅ 机制已证（`run-hook.cmd` 经 Git Bash 产出正确 JSON）；真 CC 会话待补冒烟 |
-| **Codex** | 预期可行（Unix 原生）；同命令，待补冒烟 | ✅ 实测：marketplace 装技能 + 用户级 hooks 常开 + 开关；自带钩子不自动激活 |
+| **Codex** | 预期可行（Unix 原生）；同命令，待补冒烟 | ✅ 实测全通：GitHub marketplace 装技能 + 用户级 hooks 交互注入 + 开关；自带钩子不自动激活 |
 | **Hermes** | 预期可行（Unix 原生，需 python3）；待补冒烟 | ✅ 经 **WSL** 端到端通；**原生 Windows = backlog** |
 
 - 共用机制（同一套 Unix 脚本 + 标记开关）使"机制已证"对未单独冒烟的格子有较强外推；但"机制已证"≠"实证"，三个待补冒烟格（Mac 的 Codex/Hermes、真 Windows CC 会话）如实标注。
