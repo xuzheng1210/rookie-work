@@ -35,6 +35,14 @@ for f in hooks/hooks.json hooks/session-start hooks/run-hook.cmd; do
   if [ -f "${ROOT}/dist/codex/${f}" ]; then ok "codex: ${f} present"; else bad "codex: ${f} present"; fi
 done
 
+# --- Codex marketplace manifest (static, repo-root; for `codex plugin marketplace add owner/repo`) ---
+mkt="${ROOT}/.agents/plugins/marketplace.json"
+if [ -f "$mkt" ]; then ok "codex: marketplace.json present"; else bad "codex: marketplace.json present"; fi
+if python3 -c "import json,sys;m=json.load(open('${mkt}'));p=m['plugins'][0];s=p['source'];sys.exit(0 if m.get('name')=='rookie-work-marketplace' and p.get('name')=='rookie-work' and s.get('source')=='git-subdir' and s.get('path')=='./dist/codex' else 1)" 2>/dev/null; then ok "codex: marketplace.json valid (name+plugin+git-subdir source)"; else bad "codex: marketplace.json valid (name+plugin+git-subdir source)"; fi
+
+# --- .gitattributes LF guard (a Windows clone must not CRLF-corrupt the hook scripts) ---
+if [ -f "${ROOT}/.gitattributes" ] && grep -Eq 'eol=lf' "${ROOT}/.gitattributes"; then ok ".gitattributes enforces eol=lf"; else bad ".gitattributes enforces eol=lf"; fi
+
 # --- Hermes-specific generated files ---
 hh="${ROOT}/dist/hermes/agent-hooks/rookie-work-inject.sh"
 if [ -x "$hh" ]; then ok "hermes: inject.sh present+exec"; else bad "hermes: inject.sh present+exec"; fi

@@ -1,0 +1,17 @@
+{
+  "name": "rookie-work-marketplace",
+  "interface": { "displayName": "Rookie Work" },
+  "plugins": [
+    {
+      "name": "rookie-work",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/xuzheng1210/rookie-work.git",
+        "path": "./dist/codex",
+        "ref": "main"
+      },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Safety"
+    }
+  ]
+}
