@@ -31,6 +31,8 @@ It turns **on automatically** the moment you install it — the discipline loads
 
 ## Install
 
+> **Simplest of all — hand it to your agent.** Copy this repo's link — `https://github.com/xuzheng1210/rookie-work` — paste it to the Claude Code, Codex, or Hermes you already use, and ask it to **help you install this plugin and walk you through the setup, one step at a time.** Prefer to do it yourself? Follow the steps below.
+
 rookie-work runs on three agents. **Not sure which you have? Pick Claude Code — it's the easiest, and you don't need to open anything technical.** The off-switch at the end works the same on all three.
 
 ### Claude Code — easiest, no terminal needed
