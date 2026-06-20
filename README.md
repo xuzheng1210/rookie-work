@@ -1,86 +1,142 @@
 # rookie-work
 
-> A beginner-safe workflow guardrail for Claude Code.
-> The agent never changes anything of yours before telling you — in plain language you understand — what it's about to do and how, and getting your OK.
+**English** | [简体中文](./README.zh-CN.md)
 
-## What it does
+> A beginner-safe workflow guardrail for AI coding agents — Claude Code, Codex, and Hermes.
+> The agent never changes anything of yours before telling you, in plain language you understand, what it's about to do and how — and getting your OK.
 
-rookie-work makes Claude Code work the way a careful senior engineer would, so people new to AI agents get good results without having to know what discipline to ask for:
+## Why you need it
 
-- **Explains before it acts.** Before any real change, the agent tells you — in plain language — what it will do and how, and confirms the direction with you first.
-- **No silent decisions.** Whenever there's a real choice (which approach, which model to use for a sub-task, whether to run an extra review), the agent lays out the options with pros and cons and a recommendation, and lets you pick.
-- **Right-sized ceremony.** A read-only lookup just happens. A small edit gets a quick "here's what I'll do — OK?". A real feature gets a full understand → design → plan → build → verify flow. Nothing trivial gets bogged down; nothing risky gets rushed.
-- **Leaves a trail.** Every change is recorded in a plain-language changelog, so you (and the agent, later) can see what happened and why.
-- **Gets you started even if you can't write a spec.** If you only know the result you want, it offers to build the development framework *with* you first — in plain language, one decision at a time — so you understand and own what you're building before any code.
+AI coding agents are powerful — which is exactly the problem when you're new to them. They move fast, make decisions you never saw, and sound confident even when they're wrong. If you don't read code fluently, you can't catch any of it. **rookie-work puts you back in control:** it makes the agent work like a careful senior engineer who explains everything in plain language and never acts behind your back.
 
-It is **on by default** the moment you install it.
+Everyday problems it fixes:
+
+| Without rookie-work | With rookie-work |
+| --- | --- |
+| The agent **quietly picks** an approach, library, or design — and you find out it went the wrong way only after it's built. | Every real choice is laid out in plain language with pros, cons, and a recommendation. **You** decide — nothing is settled silently. |
+| It **changes or deletes things you never asked about** ("while I was in there I improved X") and breaks something else. | Before any change, it tells you what it will do and how, and waits for your OK. If the work grows beyond the plan, it stops and asks. |
+| **Trivial things get over-engineered; risky things get rushed.** | Three tiers right-size the effort — a lookup just happens, a small edit gets a quick check, a real feature gets the full flow. |
+| It announces **"done!"** without ever running or testing anything. | "Done" means it **showed you it working** — ran it, tested it, pointed at the evidence. |
+| You have an idea but **don't even know how to start the conversation** — you can't turn it into a clear brief. | It offers to build the plan *with* you first, in plain language, one decision at a time, so you understand and own what you're building before any code. |
+
+## How it works
+
+rookie-work sizes every task into one of three tiers, so small things stay quick and risky things get care:
+
+- **Tier 0 — just do it.** Read-only: a lookup, finding a file, explaining code. Nothing changes, so there's no fuss.
+- **Tier 1 — light.** A small, low-risk change with one obvious way to do it. The agent says what it'll do, you confirm, it does it, it reports back.
+- **Tier 2 — full.** Real choices, lots of impact, or hard to undo. The agent runs the full flow: understand the project → work out the boundaries with you → design → plan → build → check it actually works.
+
+It turns **on automatically** the moment you install it — the discipline loads at the start of every session — and it always replies in **your** language.
 
 ## Install
 
-```text
-/plugin marketplace add https://github.com/xuzheng1210/rookie-work
-/plugin install rookie-work@rookie-work-marketplace
-```
+rookie-work runs on three agents. **Not sure which you have? Pick Claude Code — it's the easiest, and you don't need to open anything technical.** The off-switch at the end works the same on all three.
 
-After a new version is published, run `/plugin marketplace update` to get it.
+### Claude Code — easiest, no terminal needed
 
-## Install on Codex
+You type these commands **inside Claude Code itself** — in the same box where you chat with it. Exactly the same on Windows and Mac.
 
-Two parts — the skill (one command) and the always-on discipline (Codex does not auto-run a plugin's bundled hook, so you add one small hook entry).
+1. Open Claude Code.
+2. Type this line and press **Enter**:
+   ```text
+   /plugin marketplace add https://github.com/xuzheng1210/rookie-work
+   ```
+3. Then type this line and press **Enter**:
+   ```text
+   /plugin install rookie-work@rookie-work-marketplace
+   ```
 
-**1. Install the skill**
+That's it — rookie-work is on, and it starts working automatically in every new session. Later, to get the newest version, type `/plugin marketplace update`.
+
+### Codex
+
+For Codex you type commands in a **terminal** — a window where you type instructions. First, open one:
+
+- **On Windows — open PowerShell:** press the **Windows key**, type `powershell`, and press **Enter**. A blue window opens. (The older `cmd` works too — the commands are the same.)
+- **On Mac — open Terminal:** press **⌘ Command + Spacebar**, type `Terminal`, and press **Enter**. A small window opens.
+
+**Step 1 — install rookie-work.** In that window, type these two lines, pressing **Enter** after each (same on Windows and Mac):
 
 ```text
 codex plugin marketplace add xuzheng1210/rookie-work
 codex plugin add rookie-work@rookie-work-marketplace
 ```
 
-Now `rookie-work` is available (`$rookie-work` or `/skills`).
+rookie-work is now usable any time by typing `$rookie-work`. **If that's enough for you, you're done.** To have it start automatically in every session, do Step 2.
 
-**2. Turn on always-on discipline** (recommended)
+**Step 2 — make it automatic (optional, recommended).** This means adding a few lines to one small settings file.
 
-Add a SessionStart entry to your user-level `~/.codex/hooks.json`, pointing at the installed plugin (under `~/.codex/plugins/cache/rookie-work-marketplace/rookie-work/<version>/` — find `<version>` with `codex plugin list`):
+First, find your version number — type this and note the number it prints (for example `1.1.0`):
 
-- **Windows:**
+```text
+codex plugin list
+```
+
+Now create or open the settings file and paste in the block for your system, **replacing every `<version>` with your number**:
+
+- **On Windows** — the file is `C:\Users\YOUR-NAME\.codex\hooks.json`. Open **Notepad**, paste the block below, then "Save As" into that `.codex` folder with the name `hooks.json` (in the Save dialog set "Save as type" to **All Files** so it isn't saved as `hooks.json.txt`):
+
   ```json
   { "hooks": { "SessionStart": [ { "matcher": "startup|resume|clear|compact", "hooks": [
-    { "type": "command", "command": "cmd.exe /c \"set CLAUDE_PLUGIN_ROOT=%USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version> && %USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version>\\hooks\\run-hook.cmd session-start\"" } ] } ] } }
+    { "type": "command", "command": "cmd.exe /c \"set CLAUDE_PLUGIN_ROOT=%USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version> && %USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version>\\hooks\\run-hook.cmd session-start\"", "async": false } ] } ] } }
   ```
-- **macOS / Linux:** same idea — one SessionStart entry that sets `CLAUDE_PLUGIN_ROOT` to that plugin directory and runs `hooks/session-start` from it.
 
-Codex asks you to trust the hook on first use — approve once. Update `<version>` if you upgrade rookie-work. (Skill-only is fine too: skip step 2 and just call `$rookie-work` when you want it.)
+- **On Mac** — the file is `~/.codex/hooks.json` (the `.codex` folder is hidden; in **Finder** press **⌘ + Shift + G**, type `~/.codex`, and press Enter to jump there). Open `hooks.json` with **TextEdit** and paste:
 
-**Turn it off:** create `~/.rookie-work-off` (everywhere) or `<project>/.rookie-work-off` (one project); delete to turn back on.
+  ```json
+  { "hooks": { "SessionStart": [ { "matcher": "startup|resume|clear|compact", "hooks": [
+    { "type": "command", "command": "CLAUDE_PLUGIN_ROOT=\"$HOME/.codex/plugins/cache/rookie-work-marketplace/rookie-work/<version>\" \"$HOME/.codex/plugins/cache/rookie-work-marketplace/rookie-work/<version>/hooks/session-start\"", "async": false } ] } ] } }
+  ```
 
-## Install on Hermes
+> *Note: the Windows block above is tested on a real machine; this Mac block uses the very same hook and should work the same way. If it doesn't load, double-check the path and your `<version>` — and please open an issue so we can confirm it.*
 
-Hermes runs rookie-work as a `pre_llm_call` shell hook + skill. The hook is a Unix bash script (needs `python3`), so on **Windows run Hermes under WSL** — native-Windows Hermes is on the backlog.
+The first time, Codex asks you to approve this hook — say yes. (Whenever you update rookie-work, change `<version>` to the new number.)
 
-From a clone of this repo, in your Hermes environment (macOS / Linux / WSL):
+### Hermes
 
-```bash
+Hermes is the most hands-on of the three — pick it only if you already use Hermes. Open the right window first:
+
+- **On Mac**, open **Terminal** (⌘ Command + Spacebar, type `Terminal`, Enter).
+- **On Windows**, Hermes runs inside **WSL** (a Linux system that lives inside Windows). If you've never set up WSL, Hermes probably isn't your best starting point — use Claude Code instead. If you already have WSL, open its window.
+
+In that window, type these lines (press **Enter** after each). They download rookie-work and put its files where Hermes looks for them:
+
+```text
+git clone https://github.com/xuzheng1210/rookie-work
+cd rookie-work
+
 mkdir -p ~/.hermes/skills ~/.hermes/agent-hooks
 cp -R dist/hermes/skills/rookie-work ~/.hermes/skills/
 cp dist/hermes/agent-hooks/rookie-work-inject.sh dist/hermes/agent-hooks/SESSION-PREAMBLE.md ~/.hermes/agent-hooks/
 chmod +x ~/.hermes/agent-hooks/rookie-work-inject.sh
 ```
 
-Then merge the `hooks:` block from `dist/hermes/config-snippet.yaml` into `~/.hermes/config.yaml`. Start Hermes — `/rookie-work` is available, and the discipline loads on the first turn of each session. Hermes asks `Allow this hook to run? [y/N]` the first time (approve once, or set `hooks_auto_accept: true` in `~/.hermes/config.yaml`, or pass `--accept-hooks`).
+Finally, open the file `~/.hermes/config.yaml` in a text editor and add these lines (if it already has a `hooks:` line, put just the `pre_llm_call:` part underneath it):
 
-**Turn it off:** create `~/.rookie-work-off` (everywhere) or `<project>/.rookie-work-off` (one project); delete to turn back on. (Or disable the skill natively with `skills.disabled: [rookie-work]` in `~/.hermes/config.yaml`.)
+```yaml
+hooks:
+  pre_llm_call:
+    - command: "~/.hermes/agent-hooks/rookie-work-inject.sh"
+      timeout: 10
+```
+
+Start Hermes — type `/rookie-work` to use it, and it greets you automatically each session. The first time it asks `Allow this hook to run? [y/N]`, type `y` and press **Enter**.
 
 ## Turn it off
 
-- **Just this session:** tell the agent "turn off rookie-work" (or "give me raw mode"); it stands down for the current session.
-- **Persistently:** create an empty file `~/.rookie-work-off` to turn it off everywhere, or `<your-project>/.rookie-work-off` to turn it off for one project. Delete the file to turn it back on. (You can also just ask the agent to do this for you.)
+- **Easiest — just ask:** tell the agent "turn off rookie-work" (or "give me raw mode") and it stands down for the session; say "turn it back on" to resume. Ask it to "turn off rookie-work permanently" and it creates the file below for you (telling you first).
+- **By hand, permanently:** create an empty file named `.rookie-work-off` in your home folder to turn it off everywhere, or in one project's folder to turn it off there only. Delete the file to turn it back on.
+
+This works the same on Claude Code, Codex, and Hermes.
 
 ## Language
 
-rookie-work talks to you in **your** language — whatever you write in, it answers in.
+rookie-work talks to you in **your** language — whatever you write in, it answers in. These docs ship in English and 简体中文; the method files are in English for portability.
 
 ## Status
 
-v1.1.0 — adds a framing & boundary-finding front-stage to Tier 2 (helps users new to development turn a vague idea into a clear, owned plan before any code). v1.0.0 was the first public release. Design and implementation notes live in `docs/`.
+**v1.1.0** — adds a framing & boundary-finding front-stage to Tier 2 (helps people new to development turn a vague idea into a clear, owned plan before any code is written). v1.0.0 was the first public release. Design and implementation notes live in `docs/`.
 
 ## License
 
