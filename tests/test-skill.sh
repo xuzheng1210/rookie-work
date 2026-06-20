@@ -26,8 +26,14 @@ for m in "Which tier is this task" "the light flow" "the full method" "Disclose 
 done
 
 # Reference files exist
-for ref in "references/changelog-format.md" "references/model-and-review-policy.md"; do
+for ref in "references/changelog-format.md" "references/model-and-review-policy.md" "references/framing-and-boundaries.md"; do
   if [ -f "${REPO_ROOT}/${ref}" ]; then ok "ref exists: $ref"; else bad "ref exists: $ref"; fi
+done
+
+# Framing reference content (boundary checklist + portable template)
+FB="${REPO_ROOT}/references/framing-and-boundaries.md"
+for m in "Scope & non-goals" "Definition of done" "turn it into a development framework"; do
+  if grep -qF "$m" "$FB" 2>/dev/null; then ok "framing ref has: $m"; else bad "framing ref has: $m"; fi
 done
 
 echo "----"; echo "PASS=$PASS FAIL=$FAIL"
