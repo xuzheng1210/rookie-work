@@ -23,6 +23,51 @@ It is **on by default** the moment you install it.
 
 After a new version is published, run `/plugin marketplace update` to get it.
 
+## Install on Codex
+
+Two parts — the skill (one command) and the always-on discipline (Codex does not auto-run a plugin's bundled hook, so you add one small hook entry).
+
+**1. Install the skill**
+
+```text
+codex plugin marketplace add xuzheng1210/rookie-work
+codex plugin add rookie-work@rookie-work-marketplace
+```
+
+Now `rookie-work` is available (`$rookie-work` or `/skills`).
+
+**2. Turn on always-on discipline** (recommended)
+
+Add a SessionStart entry to your user-level `~/.codex/hooks.json`, pointing at the installed plugin (under `~/.codex/plugins/cache/rookie-work-marketplace/rookie-work/<version>/` — find `<version>` with `codex plugin list`):
+
+- **Windows:**
+  ```json
+  { "hooks": { "SessionStart": [ { "matcher": "startup|resume|clear|compact", "hooks": [
+    { "type": "command", "command": "cmd.exe /c \"set CLAUDE_PLUGIN_ROOT=%USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version> && %USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version>\\hooks\\run-hook.cmd session-start\"" } ] } ] } }
+  ```
+- **macOS / Linux:** same idea — one SessionStart entry that sets `CLAUDE_PLUGIN_ROOT` to that plugin directory and runs `hooks/session-start` from it.
+
+Codex asks you to trust the hook on first use — approve once. Update `<version>` if you upgrade rookie-work. (Skill-only is fine too: skip step 2 and just call `$rookie-work` when you want it.)
+
+**Turn it off:** create `~/.rookie-work-off` (everywhere) or `<project>/.rookie-work-off` (one project); delete to turn back on.
+
+## Install on Hermes
+
+Hermes runs rookie-work as a `pre_llm_call` shell hook + skill. The hook is a Unix bash script (needs `python3`), so on **Windows run Hermes under WSL** — native-Windows Hermes is on the backlog.
+
+From a clone of this repo, in your Hermes environment (macOS / Linux / WSL):
+
+```bash
+mkdir -p ~/.hermes/skills ~/.hermes/agent-hooks
+cp -R dist/hermes/skills/rookie-work ~/.hermes/skills/
+cp dist/hermes/agent-hooks/rookie-work-inject.sh dist/hermes/agent-hooks/SESSION-PREAMBLE.md ~/.hermes/agent-hooks/
+chmod +x ~/.hermes/agent-hooks/rookie-work-inject.sh
+```
+
+Then merge the `hooks:` block from `dist/hermes/config-snippet.yaml` into `~/.hermes/config.yaml`. Start Hermes — `/rookie-work` is available, and the discipline loads on the first turn of each session. Hermes asks `Allow this hook to run? [y/N]` the first time (approve once, or set `hooks_auto_accept: true` in `~/.hermes/config.yaml`, or pass `--accept-hooks`).
+
+**Turn it off:** create `~/.rookie-work-off` (everywhere) or `<project>/.rookie-work-off` (one project); delete to turn back on. (Or disable the skill natively with `skills.disabled: [rookie-work]` in `~/.hermes/config.yaml`.)
+
 ## Turn it off
 
 - **Just this session:** tell the agent "turn off rookie-work" (or "give me raw mode"); it stands down for the current session.
