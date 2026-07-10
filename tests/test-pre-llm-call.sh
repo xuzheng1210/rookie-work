@@ -20,16 +20,20 @@ OUT="$(run "$FIRST")"
 printf '%s' "$OUT" | python3 -m json.tool >/dev/null 2>&1 && ok "first: valid JSON" || bad "first: valid JSON"
 printf '%s' "$OUT" | grep -q '"context"' && ok "first: has context" || bad "first: has context"
 printf '%s' "$OUT" | grep -q "Explain before you act" && ok "first: injects preamble" || bad "first: injects preamble"
+printf '%s' "$OUT" | grep -qF "choose the decision pace" && ok "first: injects decision pace" || bad "first: injects decision pace"
+printf '%s' "$OUT" | grep -qF "Silence, omissions, or ambiguity are not approval" && ok "first: rejects implicit approval" || bad "first: rejects implicit approval"
 
 OUT="$(run "$NOTFIRST")"
 printf '%s' "$OUT" | grep -q "Explain before you act" && bad "non-first: no injection" || ok "non-first: no injection"
 
 touch "$TMP/home/.rookie-work-off"; OUT="$(run "$FIRST")"
 printf '%s' "$OUT" | grep -q "Explain before you act" && bad "global off: suppressed" || ok "global off: suppressed"
+printf '%s' "$OUT" | grep -qF "choose the decision pace" && bad "global off: suppresses decision pace" || ok "global off: suppresses decision pace"
 rm -f "$TMP/home/.rookie-work-off"
 
 touch "$TMP/proj/.rookie-work-off"; OUT="$(run "$FIRST")"
 printf '%s' "$OUT" | grep -q "Explain before you act" && bad "project off: suppressed" || ok "project off: suppressed"
+printf '%s' "$OUT" | grep -qF "choose the decision pace" && bad "project off: suppresses decision pace" || ok "project off: suppresses decision pace"
 
 echo "----"; echo "PASS=$PASS FAIL=$FAIL"
 [ "$FAIL" -eq 0 ]
