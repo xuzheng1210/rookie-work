@@ -21,12 +21,16 @@ LEN=${#DESC}
 if [ "$LEN" -gt 0 ] && [ "$LEN" -le 1536 ]; then ok "description length ${LEN} within 1536"; else bad "description length ${LEN} within 1536"; fi
 
 # Required body sections (dash-free substrings, to avoid em-dash matching issues)
-for m in "Which tier is this task" "the light flow" "the full method" "Disclose before you modify" "Record every change" "Turning rookie-work off and on" "Frame the work" "boundary checklist"; do
+for m in "Which tier is this task" "the light flow" "the full method" "Disclose before you modify" "Record every change" "Turning rookie-work off and on" "Frame the work" "boundary checklist" "Real-choice protocol" "Choose the decision pace" "Only explicit answers count"; do
   if grep -qF "$m" "$SKILL"; then ok "section present: $m"; else bad "section present: $m"; fi
 done
 
 # Reference files exist
-for ref in "references/changelog-format.md" "references/model-and-review-policy.md" "references/framing-and-boundaries.md"; do
+for ref in \
+  "references/changelog-format.md" \
+  "references/model-and-review-policy.md" \
+  "references/framing-and-boundaries.md" \
+  "references/decision-protocol.md"; do
   if [ -f "${REPO_ROOT}/${ref}" ]; then ok "ref exists: $ref"; else bad "ref exists: $ref"; fi
 done
 
@@ -34,6 +38,11 @@ done
 FB="${REPO_ROOT}/references/framing-and-boundaries.md"
 for m in "Scope & non-goals" "Definition of done" "turn it into a development framework"; do
   if grep -qF "$m" "$FB" 2>/dev/null; then ok "framing ref has: $m"; else bad "framing ref has: $m"; fi
+done
+
+DP="${REPO_ROOT}/references/decision-protocol.md"
+for m in "What counts as a real choice" "Choose the decision pace" "Only explicit answers count"; do
+  if grep -qF "$m" "$DP" 2>/dev/null; then ok "decision protocol has: $m"; else bad "decision protocol has: $m"; fi
 done
 
 echo "----"; echo "PASS=$PASS FAIL=$FAIL"
