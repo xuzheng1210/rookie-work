@@ -12,6 +12,13 @@ Use this when a Tier 2 task is too vague or under-specified to act on. First
 down yet — want me to help you turn it into a clear plan first, in plain
 language?"* If they already gave a clear framework, skip straight to the design.
 
+Before surfacing the first boundary, follow
+`references/decision-protocol.md`: ask the user to choose the decision pace (one
+unsettled choice at a time, or two to four related choices at a time), explain
+the trade-off, and tell them they can switch later. The boundary checklist finds
+candidate decisions; the decision protocol controls how they are presented,
+answered, recapped, and recovered.
+
 ## How to frame the work
 
 1. **Reflect the goal back as a starting framework.** In a few plain sentences,
@@ -65,9 +72,11 @@ template to paste — **in their own language** (translate it for them):
 > [write your need here, however simple]
 >
 > I may not know much about development, so please don't start building yet.
-> First help me turn it into a development framework I can understand: go through
-> these aspects with me, one at a time (ask one thing at a time, in plain words,
-> give me options and your recommendation with the reason, and don't decide
+> First help me turn it into a development framework I can understand. Before
+> asking the boundaries, ask whether I want one choice at a time or two to four
+> related choices at a time, explain the trade-off, and tell me I can switch
+> later. Then go through the relevant aspects with me using that pace (use plain
+> words, give me options and your recommendation with the reason, and don't decide
 > anything silently for me): scope & non-goals / who uses it & how / inputs &
 > outputs / data & persistence / scale / what happens when things go wrong /
 > integrations & dependencies / where it runs / definition of done / hard

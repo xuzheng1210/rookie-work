@@ -21,6 +21,9 @@ for agent in codex hermes; do
   if [ -n "$canon_md" ] && [ "$canon_md" = "$dist_md" ]; then ok "${agent}: refs set == canonical *.md (no strays)"; else bad "${agent}: refs set == canonical *.md (no strays)"; fi
   rc=1; for r in $canon_md; do diff -q "${ROOT}/references/${r}" "${base}/skills/rookie-work/references/${r}" >/dev/null 2>&1 || rc=0; done
   [ "$rc" = 1 ] && ok "${agent}: refs content == canonical" || bad "${agent}: refs content == canonical"
+  dp="${base}/skills/rookie-work/references/decision-protocol.md"
+  if [ -f "$dp" ]; then ok "${agent}: decision protocol present"; else bad "${agent}: decision protocol present"; fi
+  if grep -qF "Only explicit answers count" "$dp" 2>/dev/null; then ok "${agent}: decision protocol content present"; else bad "${agent}: decision protocol content present"; fi
 done
 
 if [ -f "${ROOT}/dist/README.md" ] && grep -q "DO NOT EDIT" "${ROOT}/dist/README.md"; then ok "dist/README.md generated-marker"; else bad "dist/README.md generated-marker"; fi

@@ -36,7 +36,7 @@ done
 
 # Framing reference content (boundary checklist + portable template)
 FB="${REPO_ROOT}/references/framing-and-boundaries.md"
-for m in "Scope & non-goals" "Definition of done" "turn it into a development framework"; do
+for m in "Scope & non-goals" "Definition of done" "turn it into a development framework" "decision-protocol.md" "choose the decision pace"; do
   if grep -qF "$m" "$FB" 2>/dev/null; then ok "framing ref has: $m"; else bad "framing ref has: $m"; fi
 done
 
