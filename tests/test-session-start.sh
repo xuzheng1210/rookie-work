@@ -6,12 +6,20 @@ set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT="${REPO_ROOT}/hooks/session-start"
+PREAMBLE="${REPO_ROOT}/SESSION-PREAMBLE.md"
 PASS=0; FAIL=0
 ok()   { echo "PASS: $1"; PASS=$((PASS+1)); }
 bad()  { echo "FAIL: $1"; FAIL=$((FAIL+1)); }
 
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/home" "$TMP/proj"
+
+PREAMBLE_WORDS="$(wc -w < "$PREAMBLE" | tr -d '[:space:]')"
+if [ "$PREAMBLE_WORDS" -le 500 ]; then
+  ok "preamble budget: ${PREAMBLE_WORDS}/500 words"
+else
+  bad "preamble budget: ${PREAMBLE_WORDS}/500 words"
+fi
 
 run_hook() {
   ( cd "$TMP/proj" && HOME="$TMP/home" CLAUDE_PLUGIN_ROOT="$REPO_ROOT" \

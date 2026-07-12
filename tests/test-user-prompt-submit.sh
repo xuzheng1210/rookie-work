@@ -11,6 +11,12 @@ bad(){ echo "FAIL: $1"; FAIL=$((FAIL+1)); }
 
 [ -f "$SCRIPT" ] && ok "hook script exists" || bad "hook script exists"
 [ -f "$GATE" ] && ok "prompt gate exists" || bad "prompt gate exists"
+GATE_WORDS="$(wc -w < "$GATE" | tr -d '[:space:]')"
+if [ "$GATE_WORDS" -le 120 ]; then
+  ok "prompt gate budget: ${GATE_WORDS}/120 words"
+else
+  bad "prompt gate budget: ${GATE_WORDS}/120 words"
+fi
 
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/home" "$TMP/proj"
