@@ -69,35 +69,18 @@ codex plugin marketplace add xuzheng1210/rookie-work
 codex plugin add rookie-work@rookie-work-marketplace
 ```
 
-现在随时输入 `$rookie-work` 就能用 rookie-work 了。**如果这样就够了,你已经装好了。** 想让它每次会话自动开启,就做第 2 步。
+现在随时输入 `$rookie-work` 就能用 rookie-work 了。**如果这样就够了,你已经装好了。** 想让它的护栏自动生效,就做第 2 步。
 
-**第 2 步 —— 让它自动开启(可选,推荐)。** 这一步是往一个小小的设置文件里加几行。
+**第 2 步 —— 审查并信任插件内置 Hook(可选,推荐)。** rookie-work 已经自带所需的两类 Hook:`SessionStart` 在任务开始时加载完整方法,`UserPromptSubmit` 在每次用户提交后恢复简短的选择门禁。不要再另外手写一份 Hook 配置。
 
-先查你的版本号——输入下面这行,记下它打印出的号码(例如 `1.1.0`):
+1. 安装插件后,启动或重新启动 Codex。
+2. 在 Codex 里面输入 `/hooks`。
+3. 找到 `rookie-work` 内置的 Hook,审查命令内容,然后信任并启用 `SessionStart` 和 `UserPromptSubmit`。
+4. 新建一个任务,让已经信任的 Hook 从一开始生效。
 
-```text
-codex plugin list
-```
+Codex 会按照 Hook 的准确内容记录信任状态。每次升级 rookie-work 后,再次打开 `/hooks`,审查并信任新增或发生变化的 Hook,再开始下一个任务。
 
-然后新建或打开设置文件,把对应你系统的那段粘进去,**并把里面每个 `<version>` 都换成你的号码**:
-
-- **Windows ——** 文件位置是 `C:\Users\你的用户名\.codex\hooks.json`。打开**记事本**,把下面这段粘进去,然后「另存为」到那个 `.codex` 文件夹、命名为 `hooks.json`(另存对话框里把「保存类型」选成**所有文件**,以免存成 `hooks.json.txt`):
-
-  ```json
-  { "hooks": { "SessionStart": [ { "matcher": "startup|resume|clear|compact", "hooks": [
-    { "type": "command", "command": "cmd.exe /c \"set CLAUDE_PLUGIN_ROOT=%USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version> && %USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version>\\hooks\\run-hook.cmd session-start\"", "async": false } ] } ] } }
-  ```
-
-- **Mac ——** 文件位置是 `~/.codex/hooks.json`(`.codex` 文件夹是隐藏的;在**访达 Finder** 里按 **⌘ + Shift + G**,输入 `~/.codex`,回车即可跳过去)。用**文本编辑(TextEdit)**打开 `hooks.json`,粘贴:
-
-  ```json
-  { "hooks": { "SessionStart": [ { "matcher": "startup|resume|clear|compact", "hooks": [
-    { "type": "command", "command": "CLAUDE_PLUGIN_ROOT=\"$HOME/.codex/plugins/cache/rookie-work-marketplace/rookie-work/<version>\" \"$HOME/.codex/plugins/cache/rookie-work-marketplace/rookie-work/<version>/hooks/session-start\"", "async": false } ] } ] } }
-  ```
-
-> *注:上面的 Windows 那段已在真机验证;这段 Mac 用的是同一个钩子,理应以相同方式工作。若加载不出来,核对一下路径和你的 `<version>`——并欢迎提个 issue,好让我们确认它。*
-
-首次使用时 Codex 会让你批准这个钩子——点同意即可。(以后每次升级 rookie-work,把 `<version>` 改成新号码。)
+**从旧版手动配置迁移:** 如果你以前曾在用户 Hook 文件中加入 rookie-work 的 `SessionStart` 条目(Windows 为 `%USERPROFILE%\.codex\hooks.json`,Mac 为 `~/.codex/hooks.json`),请先删除那条旧的 rookie-work 配置,再信任插件内置 Hook。两套来源同时保留会让它们都运行,导致启动说明重复注入。
 
 ### Hermes
 

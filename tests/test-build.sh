@@ -39,6 +39,34 @@ for f in hooks/hooks.json hooks/session-start hooks/user-prompt-submit hooks/run
   if [ -f "${ROOT}/dist/codex/${f}" ]; then ok "codex: ${f} present"; else bad "codex: ${f} present"; fi
 done
 
+# The supported Codex setup is the plugin-bundled hook plus Codex's trust
+# review. Keep both languages aligned and prevent the old version-pinned,
+# hand-written hooks.json path from returning.
+check_codex_install_docs(){
+  label="$1"; doc="$2"; trust_word="$3"; update_word="$4"; remove_word="$5"
+  section="$(awk '/^### Codex/{inside=1} /^### Hermes/{inside=0} inside' "$doc")"
+  for marker in '`/hooks`' 'SessionStart' 'UserPromptSubmit' "$trust_word" "$update_word" "$remove_word"; do
+    if printf '%s' "$section" | grep -qF "$marker"; then
+      ok "${label}: Codex setup mentions ${marker}"
+    else
+      bad "${label}: Codex setup mentions ${marker}"
+    fi
+  done
+  if printf '%s' "$section" | grep -qF 'CLAUDE_PLUGIN_ROOT'; then
+    bad "${label}: Codex setup avoids hand-written hook command"
+  else
+    ok "${label}: Codex setup avoids hand-written hook command"
+  fi
+  if printf '%s' "$section" | grep -qF '<version>'; then
+    bad "${label}: Codex setup avoids version-pinned path"
+  else
+    ok "${label}: Codex setup avoids version-pinned path"
+  fi
+}
+
+check_codex_install_docs "README" "${ROOT}/README.md" "trust" "update" "remove"
+check_codex_install_docs "README.zh-CN" "${ROOT}/README.zh-CN.md" "信任" "升级" "删除"
+
 # --- Codex marketplace manifest (static, repo-root; for `codex plugin marketplace add owner/repo`) ---
 mkt="${ROOT}/.agents/plugins/marketplace.json"
 if [ -f "$mkt" ]; then ok "codex: marketplace.json present"; else bad "codex: marketplace.json present"; fi
