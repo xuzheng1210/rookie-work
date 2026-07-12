@@ -3,11 +3,13 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROTOCOL="${ROOT}/references/decision-protocol.md"
 SCENARIOS="${ROOT}/tests/fixtures/decision-protocol-scenarios.md"
+CONTRACT="${ROOT}/tests/fixtures/decision-protocol-contract.json"
+VERIFY_CONTRACT="${ROOT}/tests/verify-decision-protocol-contract.py"
 PASS=0; FAIL=0
 ok(){ echo "PASS: $1"; PASS=$((PASS+1)); }
 bad(){ echo "FAIL: $1"; FAIL=$((FAIL+1)); }
 
-for f in "$PROTOCOL" "$SCENARIOS"; do
+for f in "$PROTOCOL" "$SCENARIOS" "$CONTRACT" "$VERIFY_CONTRACT"; do
   if [ -f "$f" ]; then ok "exists: ${f#${ROOT}/}"; else bad "exists: ${f#${ROOT}/}"; fi
 done
 
@@ -32,6 +34,23 @@ done
 for marker in "Must do" "Must not do" "Layer"; do
   if grep -qF "$marker" "$SCENARIOS" 2>/dev/null; then ok "scenario field: $marker"; else bad "scenario field: $marker"; fi
 done
+
+if python3 "$VERIFY_CONTRACT" "$SCENARIOS" "$CONTRACT" >/dev/null; then
+  ok "all 32 scenarios match their semantic contracts"
+else
+  bad "all 32 scenarios match their semantic contracts"
+fi
+
+# Prove the verifier rejects a semantic regression instead of only counting
+# IDs and headings.
+TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
+sed 's/Stop and upgrade to Tier 2 before editing/Ignore the user-visible choice/' \
+  "$SCENARIOS" > "${TMP}/mutated-scenarios.md"
+if python3 "$VERIFY_CONTRACT" "${TMP}/mutated-scenarios.md" "$CONTRACT" >/dev/null 2>&1; then
+  bad "semantic verifier rejects a changed requirement"
+else
+  ok "semantic verifier rejects a changed requirement"
+fi
 
 echo "----"; echo "PASS=$PASS FAIL=$FAIL"
 [ "$FAIL" -eq 0 ]
