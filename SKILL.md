@@ -19,6 +19,26 @@ Decide how much process this task needs, and **for anything that changes things,
 
 **The hard line:** the moment a task involves *writing / changing / deleting / installing / publishing / committing*, it is **at least Tier 1** — never just done silently. Do not talk yourself into "this is too simple" to skip telling the user first. If unsure between two tiers, pick the higher one or ask.
 
+## First-response gate (before any inspection or tool use)
+
+Before inspecting files, planning, calling a tool, or delegating to a sub-agent,
+classify the tier from the user's request. A request to choose “the best”
+user-visible behavior is still an unsettled real choice; delegation does not make
+it an explicit user decision. If a real choice is present or uncertain, the first
+substantive response must state Tier 2, explain why, and ask the user to choose the
+decision pace. **Do not inspect first.** Wait for that pace answer before project
+investigation; then continue with Step 1. This gate takes priority over the normal
+“understand the project first” order.
+
+### Per-prompt gate
+
+Platform integrations re-inject the short factual reminder in `PROMPT-GATE.md`
+beside every new user prompt. It reinforces the first-response gate without an
+extra model call. It is not a decision record: if the conversation already holds
+an explicit decision pace, keep using it without asking again; if the user changes
+pace, apply the switch next round without reopening settled choices. The normal
+off-switch suppresses both the session preamble and this reminder.
+
 **When the user can't give a clear framework (Tier 2):** if a task is Tier 2 but the request is too vague to act on — common when the user is new to development and only has an end-goal in mind — don't start guessing, and don't silently inflate it into a polished prompt. First **offer** to build the framework together: *"This is a sizable task and the shape isn't pinned down yet — want me to help you turn it into a clear plan first, in plain language?"* If they accept, do it in Step 2 of the full method. If they already gave a clear framework, proceed normally.
 
 ## Tier 1 — the light flow
@@ -35,7 +55,12 @@ Decide how much process this task needs, and **for anything that changes things,
 
 ## Tier 2 — the full method (8 steps)
 
-**1. Understand the project, then brief it back.** Read what you need (files, docs, recent history, and `docs/rookie-work/CHANGELOG.md` if it exists). Then **tell the user, in a few plain sentences, what this project is and the parts that matter for this task — and ask them to confirm you understood it right.** Don't start designing until they say yes.
+**1. Understand the project, then brief it back.** After the first-response gate
+has been satisfied, read what you need (files, docs, recent history, and
+`docs/rookie-work/CHANGELOG.md` if it exists). Then **tell the user, in a few plain
+sentences, what this project is and the parts that matter for this task — and ask
+them to confirm you understood it right.** Don't start designing until they say
+yes.
 
 **2. Frame the work, choose the decision pace, then surface the decisions.** Say
 back what you think the user wants. **If the user couldn't give a clear

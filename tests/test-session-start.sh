@@ -25,6 +25,8 @@ if printf '%s' "$OUT" | grep -q "hookSpecificOutput"; then ok "default: uses hoo
 if printf '%s' "$OUT" | grep -q "Explain before you act"; then ok "default: injects discipline"; else bad "default: injects discipline"; fi
 if printf '%s' "$OUT" | grep -q "build the framework"; then ok "default: injects framing trigger"; else bad "default: injects framing trigger"; fi
 for marker in \
+  "First-response gate" \
+  "Before any inspection, plan, tool call, or sub-agent" \
   "A real choice makes Tier 1 become Tier 2" \
   "choose the decision pace" \
   "Silence, omissions, or ambiguity are not approval"; do

@@ -20,6 +20,29 @@ ask rather than silently classify it.
 If a real choice appears in Tier 1, the task is no longer Tier 1. Stop before the
 affected change, explain why, and move to Tier 2.
 
+## First-response gate
+
+Before inspecting files, making a plan, calling a tool, or delegating to a
+sub-agent, classify the tier from the user's request. A request to choose “the
+best” user-visible wording or behavior is not an explicit user decision; the
+choice remains open. If the request contains a real choice, or you cannot reliably
+tell, the first substantive response must state Tier 2, explain why, and ask the
+user to choose the decision pace. Do not inspect first. This gate comes before the
+normal Tier 2 project-understanding step.
+
+Read-only project investigation may begin after the user answers the pace
+question. It must not be used to decide the open choice or to launch dependent
+implementation work.
+
+## Per-prompt reminder
+
+Platform integrations re-inject the same short factual reminder beside each new
+user prompt. The reminder reinforces the gate but does not itself settle, reopen,
+or defer a choice. If the conversation already records an explicit pace, keep
+using it without asking again. If the user requests a pace switch, apply it from
+the next round and leave settled choices closed. The off-switch suppresses the
+reminder together with the session preamble.
+
 ## Choose the decision pace
 
 Before surfacing the first boundary in Tier 2, ask the user to choose one pace:

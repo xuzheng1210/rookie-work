@@ -13,6 +13,8 @@ done
 
 for marker in \
   "What counts as a real choice" \
+  "First-response gate" \
+  "Per-prompt reminder" \
   "Choose the decision pace" \
   "Only explicit answers count" \
   "Conflicts, safety, and feasibility" \
@@ -22,7 +24,7 @@ for marker in \
   if grep -qF "$marker" "$PROTOCOL" 2>/dev/null; then ok "protocol marker: $marker"; else bad "protocol marker: $marker"; fi
 done
 
-for n in 01 02 03 04 05 06 07 08 09 10 11 12 13 14; do
+for n in 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16; do
   if grep -qF "DP-${n}P" "$SCENARIOS" 2>/dev/null; then ok "positive scenario DP-${n}P"; else bad "positive scenario DP-${n}P"; fi
   if grep -qF "DP-${n}N" "$SCENARIOS" 2>/dev/null; then ok "negative scenario DP-${n}N"; else bad "negative scenario DP-${n}N"; fi
 done

@@ -21,7 +21,7 @@ LEN=${#DESC}
 if [ "$LEN" -gt 0 ] && [ "$LEN" -le 1536 ]; then ok "description length ${LEN} within 1536"; else bad "description length ${LEN} within 1536"; fi
 
 # Required body sections (dash-free substrings, to avoid em-dash matching issues)
-for m in "Which tier is this task" "the light flow" "the full method" "Disclose before you modify" "Record every change" "Turning rookie-work off and on" "Frame the work" "boundary checklist" "Real-choice protocol" "Choose the decision pace" "Only explicit answers count"; do
+for m in "Which tier is this task" "the light flow" "the full method" "Disclose before you modify" "Record every change" "Turning rookie-work off and on" "Frame the work" "boundary checklist" "First-response gate" "Do not inspect first" "Per-prompt gate" "Real-choice protocol" "Choose the decision pace" "Only explicit answers count"; do
   if grep -qF "$m" "$SKILL"; then ok "section present: $m"; else bad "section present: $m"; fi
 done
 

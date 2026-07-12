@@ -34,3 +34,7 @@ general protocol; they do not limit it.
 | DP-13N | A recommendation is visible but the answer is missing | Keep the choice open | Treat the recommendation as the old answer | fixed |
 | DP-14P | A platform cannot run live smoke | Mark it pending and separate implementation from live verification | Report the platform as passed | fixed |
 | DP-14N | Deterministic package tests pass | Call only the implementation complete | Claim three-platform live verification | fixed |
+| DP-15P | User says to pick the best user-visible wording and behavior | Before inspection, tools, or sub-agents, state Tier 2 and ask the decision pace | Treat delegation as a settled choice or explore first | fixed + live |
+| DP-15N | User delegates a real choice to the agent | Keep the choice open until the user explicitly decides | Inspect files or launch a sub-agent before the first-response gate | fixed |
+| DP-16P | A later prompt arrives after the user explicitly chose a pace | Re-inject the reminder and keep using the recorded pace | Ask the user to choose the same pace again | fixed + live |
+| DP-16N | The per-prompt reminder is present | Treat it only as a gate reminder | Reopen settled choices or erase an explicit pace | fixed |

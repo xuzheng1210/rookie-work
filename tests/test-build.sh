@@ -16,6 +16,7 @@ for agent in codex hermes; do
   base="${ROOT}/dist/${agent}"
   if diff -q "${ROOT}/SKILL.md" "${base}/skills/rookie-work/SKILL.md" >/dev/null 2>&1; then ok "${agent}: SKILL.md == canonical"; else bad "${agent}: SKILL.md == canonical"; fi
   if diff -q "${ROOT}/SESSION-PREAMBLE.md" "${base}/SESSION-PREAMBLE.md" >/dev/null 2>&1; then ok "${agent}: SESSION-PREAMBLE.md == canonical"; else bad "${agent}: SESSION-PREAMBLE.md == canonical"; fi
+  if diff -q "${ROOT}/PROMPT-GATE.md" "${base}/PROMPT-GATE.md" >/dev/null 2>&1; then ok "${agent}: PROMPT-GATE.md == canonical"; else bad "${agent}: PROMPT-GATE.md == canonical"; fi
   canon_md="$(cd "${ROOT}/references" && ls *.md 2>/dev/null | sort)"
   dist_md="$( ([ -d "${base}/skills/rookie-work/references" ] && cd "${base}/skills/rookie-work/references" && ls 2>/dev/null | sort) || true )"
   if [ -n "$canon_md" ] && [ "$canon_md" = "$dist_md" ]; then ok "${agent}: refs set == canonical *.md (no strays)"; else bad "${agent}: refs set == canonical *.md (no strays)"; fi
@@ -34,7 +35,7 @@ if python3 -c "import json,sys;m=json.load(open('${cm}'));sys.exit(0 if m.get('n
 ccv="$(python3 -c "import json;print(json.load(open('${ROOT}/.claude-plugin/plugin.json'))['version'])" 2>/dev/null)"
 cxv="$(python3 -c "import json;print(json.load(open('${cm}'))['version'])" 2>/dev/null)"
 if [ -n "$cxv" ] && [ "$ccv" = "$cxv" ]; then ok "codex: version matches CC ($ccv)"; else bad "codex: version matches CC (cc=$ccv codex=$cxv)"; fi
-for f in hooks/hooks.json hooks/session-start hooks/run-hook.cmd; do
+for f in hooks/hooks.json hooks/session-start hooks/user-prompt-submit hooks/run-hook.cmd; do
   if [ -f "${ROOT}/dist/codex/${f}" ]; then ok "codex: ${f} present"; else bad "codex: ${f} present"; fi
 done
 
@@ -50,6 +51,7 @@ if [ -f "${ROOT}/.gitattributes" ] && grep -Eq 'eol=lf' "${ROOT}/.gitattributes"
 hh="${ROOT}/dist/hermes/agent-hooks/rookie-work-inject.sh"
 if [ -x "$hh" ]; then ok "hermes: inject.sh present+exec"; else bad "hermes: inject.sh present+exec"; fi
 if diff -q "${ROOT}/SESSION-PREAMBLE.md" "${ROOT}/dist/hermes/agent-hooks/SESSION-PREAMBLE.md" >/dev/null 2>&1; then ok "hermes: co-located preamble == canonical"; else bad "hermes: co-located preamble == canonical"; fi
+if diff -q "${ROOT}/PROMPT-GATE.md" "${ROOT}/dist/hermes/agent-hooks/PROMPT-GATE.md" >/dev/null 2>&1; then ok "hermes: co-located prompt gate == canonical"; else bad "hermes: co-located prompt gate == canonical"; fi
 if [ -f "${ROOT}/dist/hermes/config-snippet.yaml" ]; then ok "hermes: config-snippet.yaml present"; else bad "hermes: config-snippet.yaml present"; fi
 if [ -f "${ROOT}/dist/hermes/INSTALL.md" ]; then ok "hermes: INSTALL.md present"; else bad "hermes: INSTALL.md present"; fi
 
