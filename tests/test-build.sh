@@ -39,6 +39,53 @@ for f in hooks/hooks.json hooks/session-start hooks/user-prompt-submit hooks/run
   if [ -f "${ROOT}/dist/codex/${f}" ]; then ok "codex: ${f} present"; else bad "codex: ${f} present"; fi
 done
 
+# Validate the declared integration, not just the presence of hook files.
+codex_hooks="${ROOT}/dist/codex/hooks/hooks.json"
+if python3 -c 'import json,sys; h=json.load(open(sys.argv[1]))["hooks"]; assert set(h)=={"SessionStart","UserPromptSubmit"}' "$codex_hooks" 2>/dev/null; then
+  ok "codex: hooks.json declares exactly both required events"
+else
+  bad "codex: hooks.json declares exactly both required events"
+fi
+if python3 -c 'import json,sys; x=json.load(open(sys.argv[1]))["hooks"]["SessionStart"][0]; c=x["hooks"][0]; assert x["matcher"]=="startup|resume|clear|compact" and c=={"type":"command","command":"\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-start","async":False}' "$codex_hooks" 2>/dev/null; then
+  ok "codex: SessionStart declaration targets generated wrapper"
+else
+  bad "codex: SessionStart declaration targets generated wrapper"
+fi
+if python3 -c 'import json,sys; x=json.load(open(sys.argv[1]))["hooks"]["UserPromptSubmit"][0]; c=x["hooks"][0]; assert "matcher" not in x and c=={"type":"command","command":"\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" user-prompt-submit","async":False}' "$codex_hooks" 2>/dev/null; then
+  ok "codex: UserPromptSubmit declaration targets generated wrapper"
+else
+  bad "codex: UserPromptSubmit declaration targets generated wrapper"
+fi
+
+# Execute the generated package from a temporary installed layout through the
+# same wrapper named by hooks.json. This catches packaging/path drift.
+CX_TMP="$(mktemp -d)"
+mkdir -p "${CX_TMP}/home" "${CX_TMP}/project"
+cp -R "${ROOT}/dist/codex" "${CX_TMP}/plugin"
+run_generated_codex_hook(){
+  hook_name="$1"
+  ( cd "${CX_TMP}/project" && HOME="${CX_TMP}/home" \
+      CLAUDE_PLUGIN_ROOT="${CX_TMP}/plugin" CODEX_PROJECT_DIR="${CX_TMP}/project" \
+      bash "${CX_TMP}/plugin/hooks/run-hook.cmd" "$hook_name" <<<'{}' )
+}
+cx_session="$(run_generated_codex_hook session-start 2>/dev/null || true)"
+if printf '%s' "$cx_session" | python3 -m json.tool >/dev/null 2>&1 && \
+   printf '%s' "$cx_session" | grep -qF 'SessionStart' && \
+   printf '%s' "$cx_session" | grep -qF 'Explain before you act'; then
+  ok "codex: generated SessionStart executes with canonical context"
+else
+  bad "codex: generated SessionStart executes with canonical context"
+fi
+cx_prompt="$(run_generated_codex_hook user-prompt-submit 2>/dev/null || true)"
+if printf '%s' "$cx_prompt" | python3 -m json.tool >/dev/null 2>&1 && \
+   printf '%s' "$cx_prompt" | grep -qF 'UserPromptSubmit' && \
+   printf '%s' "$cx_prompt" | grep -qF 'Current prompt state'; then
+  ok "codex: generated UserPromptSubmit executes with canonical gate"
+else
+  bad "codex: generated UserPromptSubmit executes with canonical gate"
+fi
+rm -rf "$CX_TMP"
+
 # The supported Codex setup is the plugin-bundled hook plus Codex's trust
 # review. Keep both languages aligned and prevent the old version-pinned,
 # hand-written hooks.json path from returning.
