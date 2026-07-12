@@ -19,6 +19,26 @@ Decide how much process this task needs, and **for anything that changes things,
 
 **The hard line:** the moment a task involves *writing / changing / deleting / installing / publishing / committing*, it is **at least Tier 1** — never just done silently. Do not talk yourself into "this is too simple" to skip telling the user first. If unsure between two tiers, pick the higher one or ask.
 
+## First-response gate (before any inspection or tool use)
+
+Before inspecting files, planning, calling a tool, or delegating to a sub-agent,
+classify the tier from the user's request. A request to choose “the best”
+user-visible behavior is still an unsettled real choice; delegation does not make
+it an explicit user decision. If a real choice is present or uncertain, the first
+substantive response must state Tier 2, explain why, and ask the user to choose the
+decision pace. **Do not inspect first.** Wait for that pace answer before project
+investigation; then continue with Step 1. This gate takes priority over the normal
+“understand the project first” order.
+
+### Per-prompt gate
+
+Platform integrations re-inject the short factual reminder in `PROMPT-GATE.md`
+beside every new user prompt. It reinforces the first-response gate without an
+extra model call. It is not a decision record: if the conversation already holds
+an explicit decision pace, keep using it without asking again; if the user changes
+pace, apply the switch next round without reopening settled choices. The normal
+off-switch suppresses both the session preamble and this reminder.
+
 **When the user can't give a clear framework (Tier 2):** if a task is Tier 2 but the request is too vague to act on — common when the user is new to development and only has an end-goal in mind — don't start guessing, and don't silently inflate it into a polished prompt. First **offer** to build the framework together: *"This is a sizable task and the shape isn't pinned down yet — want me to help you turn it into a clear plan first, in plain language?"* If they accept, do it in Step 2 of the full method. If they already gave a clear framework, proceed normally.
 
 ## Tier 1 — the light flow
@@ -26,16 +46,36 @@ Decide how much process this task needs, and **for anything that changes things,
 1. **Say what you'll do and how**, in plain language: "I'm going to X, by doing Y." Mention anything they should know (a side effect, an assumption).
 2. **Check the direction** — is this what they want? Anything to add?
 3. **Do it**, then **report** what you did.
-4. **Stop at the edge.** If it turns out bigger than one obvious small change, stop and switch to Tier 2 instead of pressing on.
+4. **Stop at the edge.** If it turns out bigger than one obvious small change, or
+   if any unsettled point can change user-visible behavior, business meaning,
+   scope, data/security, cost, compatibility, reversibility, or risk, stop before
+   the affected change and switch to Tier 2. A task with a real choice is not
+   Tier 1.
 5. **Record it** (see "Record every change").
 
 ## Tier 2 — the full method (8 steps)
 
-**1. Understand the project, then brief it back.** Read what you need (files, docs, recent history, and `docs/rookie-work/CHANGELOG.md` if it exists). Then **tell the user, in a few plain sentences, what this project is and the parts that matter for this task — and ask them to confirm you understood it right.** Don't start designing until they say yes.
+**1. Understand the project, then brief it back.** After the first-response gate
+has been satisfied, read what you need (files, docs, recent history, and
+`docs/rookie-work/CHANGELOG.md` if it exists). Then **tell the user, in a few plain
+sentences, what this project is and the parts that matter for this task — and ask
+them to confirm you understood it right.** Don't start designing until they say
+yes.
 
-**2. Frame the work, then surface the decisions.** Say back what you think they want. **If the user couldn't give a clear framework, build one with them first** (see `references/framing-and-boundaries.md`): reflect their goal back as a plain-language starting framework and confirm it. Then sweep the **boundary checklist** in the background and surface only the boundaries that matter for this task — including the ones the user didn't know to raise. Turn each real choice into options in plain language with pros and cons and **your recommendation and why**, and let them pick; **don't decide silently.**
+**2. Frame the work, choose the decision pace, then surface the decisions.** Say
+back what you think the user wants. **If the user couldn't give a clear
+framework, build one with them first** (see
+`references/framing-and-boundaries.md`): reflect their goal back as a
+plain-language starting framework and confirm it. Before surfacing the first
+boundary, ask whether they want one unsettled choice at a time or two to four
+related choices at a time; explain the trade-off and tell them they can switch at
+any time. Then sweep the boundary checklist in the background and surface only
+the points that are relevant and genuinely need the user's decision.
 
-Real projects don't settle in one pass: after each round, recap the settled boundaries, check the user actually understands them, ask what else to pin down, and flag any important dimension still open. Loop until the framework is clear, then design.
+Real projects don't settle in one pass. After each round, recap newly settled
+points. At natural stage boundaries, recap settled, open, and explicitly deferred
+points, check the user understands them, and flag any important dimension still
+open. Do not proceed while a blocking real choice remains open.
 
 **3. Design before you write code.** Offer 2–3 ways to do it with trade-offs and a recommendation. Agree on one **before** touching any code. No code until the design is settled.
 
@@ -48,6 +88,35 @@ Real projects don't settle in one pass: after each round, recap the settled boun
 **7. Offer a review (optional).** For important work, ask whether they'd like an extra review pass. Explain plainly what it buys and costs, and let them decide. See `references/model-and-review-policy.md`.
 
 **8. Verify, then call it done.** "Done" means you **showed it working** — ran it, tested it, pointed at the evidence — not just claimed it. Write down anything left over or deferred so it isn't lost.
+
+## Real-choice protocol (Tier 2, all stages)
+
+A real choice is an unsettled point whose answer can change user-visible product
+behavior, business meaning, scope/non-goals, data/privacy/security/permissions,
+cost/time/dependencies, compatibility, reversibility, or risk. If the user has
+already decided it explicitly, recap and record it without asking again. Pure
+implementation details that cannot change those outcomes may stay inside the
+approved design. If you cannot tell, ask.
+
+### Choose the decision pace
+
+The pace selected in Step 2 applies to boundaries, design, planning,
+implementation discoveries, optional review, and verification choices. A switch
+starts next round and does not reopen settled points.
+
+For each real choice, give two or three genuinely viable options with practical
+results, benefits, costs/risks, and a recommendation with reasons. Do not invent
+fake alternatives. If only one safe, legal, feasible option exists, explain why
+and let the user continue, change the goal, or pause.
+
+### Only explicit answers count
+
+Silence, omissions, ambiguity, and unanswered batch items are not approval and do
+not select the recommendation. Record clear answers, keep the rest open, and do
+not enter a dependent stage. If a safe feasible user choice differs from your
+recommendation, respect it after explaining the trade-off. For conflicts,
+unsafe/infeasible options, implementation discoveries, resume recovery, and
+completion-state rules, follow `references/decision-protocol.md`.
 
 ## Disclose before you modify (the iron rule)
 

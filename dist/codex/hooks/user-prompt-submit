@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# rookie-work UserPromptSubmit hook: inject a short gate beside every prompt,
+# unless an off-switch marker is present.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+GLOBAL_OFF="${HOME}/.rookie-work-off"
+PROJECT_DIR="${CODEX_PROJECT_DIR:-${CLAUDE_PROJECT_DIR:-$PWD}}"
+PROJECT_OFF="${PROJECT_DIR}/.rookie-work-off"
+
+if [ -f "$GLOBAL_OFF" ] || [ -f "$PROJECT_OFF" ]; then
+  printf '{}\n'; exit 0
+fi
+
+CONTEXT="$(cat "${PLUGIN_ROOT}/PROMPT-GATE.md" 2>/dev/null || echo "rookie-work prompt gate is active, but PROMPT-GATE.md is missing.")"
+
+escape_for_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
+CTX="$(escape_for_json "$CONTEXT")"
+
+printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "UserPromptSubmit",\n    "additionalContext": "%s"\n  }\n}\n' "$CTX"
+exit 0

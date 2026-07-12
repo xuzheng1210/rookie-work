@@ -69,35 +69,18 @@ codex plugin marketplace add xuzheng1210/rookie-work
 codex plugin add rookie-work@rookie-work-marketplace
 ```
 
-rookie-work is now usable any time by typing `$rookie-work`. **If that's enough for you, you're done.** To have it start automatically in every session, do Step 2.
+rookie-work is now usable any time by typing `$rookie-work`. **If that's enough for you, you're done.** To have its guardrails start automatically, do Step 2.
 
-**Step 2 — make it automatic (optional, recommended).** This means adding a few lines to one small settings file.
+**Step 2 — review and trust the bundled hooks (optional, recommended).** rookie-work already includes both hooks it needs: `SessionStart` loads the full method when a task starts, and `UserPromptSubmit` restores the short decision gate on every prompt. Do not create a separate hook configuration.
 
-First, find your version number — type this and note the number it prints (for example `1.1.0`):
+1. Start or restart Codex after installing the plugin.
+2. Inside Codex, type `/hooks`.
+3. Find the hooks bundled with `rookie-work`, review their commands, then trust and enable both `SessionStart` and `UserPromptSubmit`.
+4. Start a new task so the trusted hooks can take effect from the beginning.
 
-```text
-codex plugin list
-```
+Codex records trust for the exact hook definition. After you update rookie-work, open `/hooks` again and review any new or changed hooks before starting the next task.
 
-Now create or open the settings file and paste in the block for your system, **replacing every `<version>` with your number**:
-
-- **On Windows** — the file is `C:\Users\YOUR-NAME\.codex\hooks.json`. Open **Notepad**, paste the block below, then "Save As" into that `.codex` folder with the name `hooks.json` (in the Save dialog set "Save as type" to **All Files** so it isn't saved as `hooks.json.txt`):
-
-  ```json
-  { "hooks": { "SessionStart": [ { "matcher": "startup|resume|clear|compact", "hooks": [
-    { "type": "command", "command": "cmd.exe /c \"set CLAUDE_PLUGIN_ROOT=%USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version> && %USERPROFILE%\\.codex\\plugins\\cache\\rookie-work-marketplace\\rookie-work\\<version>\\hooks\\run-hook.cmd session-start\"", "async": false } ] } ] } }
-  ```
-
-- **On Mac** — the file is `~/.codex/hooks.json` (the `.codex` folder is hidden; in **Finder** press **⌘ + Shift + G**, type `~/.codex`, and press Enter to jump there). Open `hooks.json` with **TextEdit** and paste:
-
-  ```json
-  { "hooks": { "SessionStart": [ { "matcher": "startup|resume|clear|compact", "hooks": [
-    { "type": "command", "command": "CLAUDE_PLUGIN_ROOT=\"$HOME/.codex/plugins/cache/rookie-work-marketplace/rookie-work/<version>\" \"$HOME/.codex/plugins/cache/rookie-work-marketplace/rookie-work/<version>/hooks/session-start\"", "async": false } ] } ] } }
-  ```
-
-> *Note: the Windows block above is tested on a real machine; this Mac block uses the very same hook and should work the same way. If it doesn't load, double-check the path and your `<version>` — and please open an issue so we can confirm it.*
-
-The first time, Codex asks you to approve this hook — say yes. (Whenever you update rookie-work, change `<version>` to the new number.)
+**Migrating from the older manual setup:** if you previously added a rookie-work `SessionStart` entry to your user hook file (`%USERPROFILE%\.codex\hooks.json` on Windows or `~/.codex/hooks.json` on Mac), remove that old rookie-work entry before trusting the bundled hooks. Keeping both sources would run both copies and inject the same startup guidance twice.
 
 ### Hermes
 
@@ -114,7 +97,7 @@ cd rookie-work
 
 mkdir -p ~/.hermes/skills ~/.hermes/agent-hooks
 cp -R dist/hermes/skills/rookie-work ~/.hermes/skills/
-cp dist/hermes/agent-hooks/rookie-work-inject.sh dist/hermes/agent-hooks/SESSION-PREAMBLE.md ~/.hermes/agent-hooks/
+cp dist/hermes/agent-hooks/rookie-work-inject.sh dist/hermes/agent-hooks/SESSION-PREAMBLE.md dist/hermes/agent-hooks/PROMPT-GATE.md ~/.hermes/agent-hooks/
 chmod +x ~/.hermes/agent-hooks/rookie-work-inject.sh
 ```
 
