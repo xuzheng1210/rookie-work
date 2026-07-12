@@ -5,10 +5,10 @@
    cp -R skills/rookie-work ~/.hermes/skills/
    # or: hermes skills tap add xuzheng1210/rookie-work
    ```
-2) Install the always-on hook (script + its preamble, kept together):
+2) Install the always-on hook (script + its preamble and prompt gate, kept together):
    ```bash
    mkdir -p ~/.hermes/agent-hooks
-   cp agent-hooks/rookie-work-inject.sh agent-hooks/SESSION-PREAMBLE.md ~/.hermes/agent-hooks/
+   cp agent-hooks/rookie-work-inject.sh agent-hooks/SESSION-PREAMBLE.md agent-hooks/PROMPT-GATE.md ~/.hermes/agent-hooks/
    ```
    Then merge `config-snippet.yaml` into `~/.hermes/config.yaml`. The first run asks you to
    approve the shell hook (or set `HERMES_ACCEPT_HOOKS=1`, or `hooks_auto_accept: true`).

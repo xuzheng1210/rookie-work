@@ -114,7 +114,7 @@ cd rookie-work
 
 mkdir -p ~/.hermes/skills ~/.hermes/agent-hooks
 cp -R dist/hermes/skills/rookie-work ~/.hermes/skills/
-cp dist/hermes/agent-hooks/rookie-work-inject.sh dist/hermes/agent-hooks/SESSION-PREAMBLE.md ~/.hermes/agent-hooks/
+cp dist/hermes/agent-hooks/rookie-work-inject.sh dist/hermes/agent-hooks/SESSION-PREAMBLE.md dist/hermes/agent-hooks/PROMPT-GATE.md ~/.hermes/agent-hooks/
 chmod +x ~/.hermes/agent-hooks/rookie-work-inject.sh
 ```
 

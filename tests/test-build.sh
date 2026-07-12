@@ -55,6 +55,42 @@ if diff -q "${ROOT}/PROMPT-GATE.md" "${ROOT}/dist/hermes/agent-hooks/PROMPT-GATE
 if [ -f "${ROOT}/dist/hermes/config-snippet.yaml" ]; then ok "hermes: config-snippet.yaml present"; else bad "hermes: config-snippet.yaml present"; fi
 if [ -f "${ROOT}/dist/hermes/INSTALL.md" ]; then ok "hermes: INSTALL.md present"; else bad "hermes: INSTALL.md present"; fi
 
+# Follow each published Hermes copy command in an isolated home, then run the
+# installed hook on a later turn. This catches install docs that omit a runtime
+# dependency even when the package itself contains the file.
+smoke_hermes_install_doc(){
+  label="$1"; doc="$2"; source_root="$3"
+  tmp="$(mktemp -d)"
+  mkdir -p "${tmp}/home/.hermes/agent-hooks" "${tmp}/project"
+  line="$(grep -E '^[[:space:]]*cp .*SESSION-PREAMBLE\.md .*~/\.hermes/agent-hooks/' "$doc" | head -n 1)"
+  if [ -z "$line" ]; then
+    bad "${label}: Hermes hook copy command found"
+    rm -rf "$tmp"
+    return
+  fi
+  set -- $line
+  shift
+  for source in "$@"; do
+    [ "$source" = '~/.hermes/agent-hooks/' ] && break
+    cp "${source_root}/${source}" "${tmp}/home/.hermes/agent-hooks/" 2>/dev/null || true
+  done
+  chmod +x "${tmp}/home/.hermes/agent-hooks/rookie-work-inject.sh" 2>/dev/null || true
+  out="$(cd "${tmp}/project" && HOME="${tmp}/home" \
+    bash "${tmp}/home/.hermes/agent-hooks/rookie-work-inject.sh" \
+    <<<'{"extra":{"is_first_turn":false}}' 2>/dev/null || true)"
+  if printf '%s' "$out" | grep -qF 'Current prompt state' && \
+     ! printf '%s' "$out" | grep -qF 'PROMPT-GATE.md is missing'; then
+    ok "${label}: documented Hermes install loads later-turn gate"
+  else
+    bad "${label}: documented Hermes install loads later-turn gate"
+  fi
+  rm -rf "$tmp"
+}
+
+smoke_hermes_install_doc "dist INSTALL" "${ROOT}/dist/hermes/INSTALL.md" "${ROOT}/dist/hermes"
+smoke_hermes_install_doc "README" "${ROOT}/README.md" "${ROOT}"
+smoke_hermes_install_doc "README.zh-CN" "${ROOT}/README.zh-CN.md" "${ROOT}"
+
 # Determinism: snapshot, rebuild, compare contents
 T1="$(mktemp -d)"; cp -R "${ROOT}/dist" "${T1}/dist1"
 bash "${ROOT}/build/build.sh" >/dev/null 2>&1
